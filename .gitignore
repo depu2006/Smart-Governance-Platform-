@@ -24,3 +24,5 @@ logs/
 
 # Temporary / Scratch
 .github/modernize*
+effective-pom
+
