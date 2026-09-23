@@ -2,7 +2,6 @@ package com.example.civicpulsebackend.citizen.controller;
 
 import com.example.civicpulsebackend.citizen.entity.Department;
 import com.example.civicpulsebackend.citizen.repository.DepartmentRepository;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class DepartmentController {
     }
     
     @PostMapping
-    public Department create(@RequestBody @NonNull Department entity) {
+    public Department create(@RequestBody Department entity) {
         return repository.save(entity);
     }
 }

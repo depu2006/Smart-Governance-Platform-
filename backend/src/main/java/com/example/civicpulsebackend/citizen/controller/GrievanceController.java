@@ -2,7 +2,6 @@ package com.example.civicpulsebackend.citizen.controller;
 
 import com.example.civicpulsebackend.citizen.entity.Grievance;
 import com.example.civicpulsebackend.citizen.repository.GrievanceRepository;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class GrievanceController {
     }
     
     @PostMapping
-    public Grievance create(@RequestBody @NonNull Grievance entity) {
+    public Grievance create(@RequestBody Grievance entity) {
         return repository.save(entity);
     }
 }

@@ -2,7 +2,6 @@ package com.example.civicpulsebackend.welfare.controller;
 
 import com.example.civicpulsebackend.welfare.entity.Workflow;
 import com.example.civicpulsebackend.welfare.repository.WorkflowRepository;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class WorkflowController {
     }
     
     @PostMapping
-    public Workflow create(@RequestBody @NonNull Workflow entity) {
+    public Workflow create(@RequestBody Workflow entity) {
         return repository.save(entity);
     }
 }

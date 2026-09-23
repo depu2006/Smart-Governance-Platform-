@@ -2,7 +2,6 @@ package com.example.civicpulsebackend.welfare.controller;
 
 import com.example.civicpulsebackend.welfare.entity.Budget;
 import com.example.civicpulsebackend.welfare.repository.BudgetRepository;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class BudgetController {
     }
     
     @PostMapping
-    public Budget create(@RequestBody @NonNull Budget entity) {
+    public Budget create(@RequestBody Budget entity) {
         return repository.save(entity);
     }
 }

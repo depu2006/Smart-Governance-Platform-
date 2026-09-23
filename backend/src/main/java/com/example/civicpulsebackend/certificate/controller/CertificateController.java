@@ -2,7 +2,6 @@ package com.example.civicpulsebackend.certificate.controller;
 
 import com.example.civicpulsebackend.certificate.entity.Certificate;
 import com.example.civicpulsebackend.certificate.repository.CertificateRepository;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class CertificateController {
     }
     
     @PostMapping
-    public Certificate create(@RequestBody @NonNull Certificate entity) {
+    public Certificate create(@RequestBody Certificate entity) {
         return repository.save(entity);
     }
 }

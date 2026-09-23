@@ -2,7 +2,6 @@ package com.example.civicpulsebackend.welfare.controller;
 
 import com.example.civicpulsebackend.welfare.entity.Asset;
 import com.example.civicpulsebackend.welfare.repository.AssetRepository;
-import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public class AssetController {
     }
     
     @PostMapping
-    public Asset create(@RequestBody @NonNull Asset entity) {
+    public Asset create(@RequestBody Asset entity) {
         return repository.save(entity);
     }
 }
