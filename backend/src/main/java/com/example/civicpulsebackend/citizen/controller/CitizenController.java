@@ -22,6 +22,7 @@ public class CitizenController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Citizen create(@RequestBody Citizen entity) {
         return repository.save(entity);
     }

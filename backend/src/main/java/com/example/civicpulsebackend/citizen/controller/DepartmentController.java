@@ -22,6 +22,7 @@ public class DepartmentController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Department create(@RequestBody Department entity) {
         return repository.save(entity);
     }

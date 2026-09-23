@@ -22,6 +22,7 @@ public class AssetController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Asset create(@RequestBody Asset entity) {
         return repository.save(entity);
     }

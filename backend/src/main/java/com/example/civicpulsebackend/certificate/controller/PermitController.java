@@ -22,6 +22,7 @@ public class PermitController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Permit create(@RequestBody Permit entity) {
         return repository.save(entity);
     }

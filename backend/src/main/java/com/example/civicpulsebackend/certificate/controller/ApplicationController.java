@@ -22,6 +22,7 @@ public class ApplicationController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Application create(@RequestBody Application entity) {
         return repository.save(entity);
     }

@@ -22,6 +22,7 @@ public class GrievanceController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Grievance create(@RequestBody Grievance entity) {
         return repository.save(entity);
     }

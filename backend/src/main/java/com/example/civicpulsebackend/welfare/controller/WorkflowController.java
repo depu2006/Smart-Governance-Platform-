@@ -22,6 +22,7 @@ public class WorkflowController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Workflow create(@RequestBody Workflow entity) {
         return repository.save(entity);
     }

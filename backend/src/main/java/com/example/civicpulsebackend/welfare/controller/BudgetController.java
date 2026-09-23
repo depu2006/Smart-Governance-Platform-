@@ -22,6 +22,7 @@ public class BudgetController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Budget create(@RequestBody Budget entity) {
         return repository.save(entity);
     }

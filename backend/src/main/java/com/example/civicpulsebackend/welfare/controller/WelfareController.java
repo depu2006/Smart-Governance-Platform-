@@ -22,6 +22,7 @@ public class WelfareController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Welfare create(@RequestBody Welfare entity) {
         return repository.save(entity);
     }

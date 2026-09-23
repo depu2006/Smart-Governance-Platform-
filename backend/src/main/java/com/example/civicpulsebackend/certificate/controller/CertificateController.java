@@ -22,6 +22,7 @@ public class CertificateController {
     }
     
     @PostMapping
+    @SuppressWarnings("null")
     public Certificate create(@RequestBody Certificate entity) {
         return repository.save(entity);
     }
