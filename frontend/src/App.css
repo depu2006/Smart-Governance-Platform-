@@ -315,12 +315,12 @@ html, body, #root {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(3, 7, 18, 0.78);
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.72);
   color: #ffffff;
-  font-weight: 700;
-  font-size: 0.85rem;
+  font-weight: 800;
+  font-size: 0.95rem;
 }
 
 .card-content {
@@ -335,7 +335,9 @@ html, body, #root {
 .card-content h2 {
   font-size: 1.45rem;
   line-height: 1.15;
-  font-weight: 700;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
   letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
