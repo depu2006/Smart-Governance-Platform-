@@ -41,8 +41,8 @@ export const ReportsAnalyticsView = ({
             <ul className="kpi-bullet-list">
               <li><strong>Services:</strong> {data?.servicesSummary || "24.7K requests | 94% resolved | Avg 2.4 days"}</li>
               <li><strong>Grievances:</strong> {data?.grievancesSummary || "12.4K filed | 94% resolved | MTTR 47 hrs"}</li>
-              <li><strong>Revenue:</strong> {data?.revenueSummary || "$12.4M | Property Tax 67% | Licenses 23%"}</li>
-              <li><strong>Budget:</strong> {data?.budgetSummary || "$47M allocated | $41M utilized | 87%"}</li>
+              <li><strong>Revenue:</strong> {data?.revenueSummary || "₹12.4M | Property Tax 67% | Licenses 23%"}</li>
+              <li><strong>Budget:</strong> {data?.budgetSummary || "₹47M allocated | ₹41M utilized | 87%"}</li>
               <li><strong>Departments:</strong> {data?.departmentsSummary || "Water 94% | Health 91% | Education 89%"}</li>
               <li><strong>Citizen SAT:</strong> {data?.citizenSatSummary || "4.7/5 | Complaints ↓ 23% | Services ↑ 47%"}</li>
             </ul>

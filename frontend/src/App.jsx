@@ -21,7 +21,12 @@ function App() {
     category: 'ALL',
   });
 
-  // Initialize with initial dynamic calculation for default filters
+  // Modal and Toast State
+  const [toast, setToast] = useState(null);
+  const [activeModal, setActiveModal] = useState(null); // 'grievance', 'service', 'feedback', 'payment', 'budget', 'logout'
+  const [modalForm, setModalForm] = useState({});
+
+  // Initialize with dynamic calculation
   const initialData = getFilteredGovernanceData({ dateRange: 'ALL', department: 'ALL', ward: 'ALL' });
 
   const [execData, setExecData] = useState(initialData);
@@ -33,7 +38,14 @@ function App() {
   const [satisfactionData, setSatisfactionData] = useState(initialData.satisfactionData);
   const [loading, setLoading] = useState(false);
 
-  // Immediately update dynamic state when filters change, then sync with backend
+  const showToast = (message, type = 'info') => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(null);
+    }, 3800);
+  };
+
+  // Update dynamic state when filters change
   useEffect(() => {
     const dynamicFilteredData = getFilteredGovernanceData(filters);
     setExecData(dynamicFilteredData);
@@ -99,13 +111,34 @@ function App() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    showToast('📄 Governance CSV Report exported successfully!', 'success');
   };
 
   const handleExportPdf = () => {
     setActiveTab('reports');
+    showToast('🖨️ Opening Print / PDF Report Generator...', 'info');
     setTimeout(() => {
       window.print();
-    }, 300);
+    }, 400);
+  };
+
+  const handleModalSubmit = (e) => {
+    e.preventDefault();
+    if (activeModal === 'grievance') {
+      showToast(`✓ Grievance submitted successfully! Tracking ID: #GRV-2024-${Math.floor(1000 + Math.random() * 9000)}`, 'success');
+    } else if (activeModal === 'service') {
+      showToast(`✓ Service Application registered! Reference ID: #APP-2024-${Math.floor(1000 + Math.random() * 9000)}`, 'success');
+    } else if (activeModal === 'feedback') {
+      showToast('✓ Citizen Feedback recorded! Thank you for rating.', 'success');
+    } else if (activeModal === 'payment') {
+      showToast(`✓ Payment recorded! Receipt #REC-${Math.floor(100000 + Math.random() * 900000)} generated.`, 'success');
+    } else if (activeModal === 'budget') {
+      showToast('✓ Department Budget re-allocation saved successfully!', 'success');
+    } else if (activeModal === 'logout') {
+      showToast('🔒 Municipal Admin session signed out cleanly.', 'warning');
+    }
+    setActiveModal(null);
+    setModalForm({});
   };
 
   const navItems = [
@@ -121,14 +154,29 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Floating Toast Notification */}
+      {toast && (
+        <div className="toast-container">
+          <div className={`toast ${toast.type}`}>
+            <span>{toast.message}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Sidebar */}
       <div className="sidebar">
-        <h2 className="logo">CivicPulse Nexus</h2>
+        <h2 className="logo" onClick={() => setActiveTab('command')} style={{ cursor: 'pointer' }}>
+          🏛️ CivicPulse Nexus
+        </h2>
         <nav>
           {navItems.map((item) => (
             <button
               key={item.id}
               className={activeTab === item.id ? 'active' : ''}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
             >
               {item.label}
             </button>
@@ -145,14 +193,18 @@ function App() {
             <span className="milestone-badge">Final Integrated Platform</span>
           </div>
           <div className="header-right">
-            <span className="user-role">Municipal Admin | Logout</span>
+            <span className="user-role">Municipal Admin</span>
+            <button className="logout-btn" onClick={() => setActiveModal('logout')}>Logout</button>
           </div>
         </header>
 
         <div className="dashboard-content">
           <FilterBar
             filters={filters}
-            onFilterChange={setFilters}
+            onFilterChange={(newFilters) => {
+              setFilters(newFilters);
+              showToast(`Filters updated: ${newFilters.department} | ${newFilters.ward} | ${newFilters.dateRange}`, 'info');
+            }}
             onExportCsv={handleExportCsv}
             onExportPdf={handleExportPdf}
           />
@@ -169,17 +221,50 @@ function App() {
                   data={execData}
                   onNavigateTab={(tab) => setActiveTab(tab)}
                   onExportReport={handleExportPdf}
+                  onShowToast={showToast}
+                  onOpenModal={(modal) => setActiveModal(modal)}
                 />
               )}
-              {activeTab === 'citizens' && <CitizenSatisfactionView data={satisfactionData} />}
-              {activeTab === 'services' && <ServiceMetricsView data={serviceData} />}
-              {activeTab === 'grievances' && <GrievanceAnalyticsView data={grievanceData} />}
-              {activeTab === 'permits' && <DepartmentPerformanceView data={deptData} />}
+              {activeTab === 'citizens' && (
+                <CitizenSatisfactionView 
+                  data={satisfactionData} 
+                  onShowToast={showToast}
+                  onOpenModal={(modal) => setActiveModal(modal)}
+                />
+              )}
+              {activeTab === 'services' && (
+                <ServiceMetricsView 
+                  data={serviceData} 
+                  onShowToast={showToast}
+                  onOpenModal={(modal) => setActiveModal(modal)}
+                />
+              )}
+              {activeTab === 'grievances' && (
+                <GrievanceAnalyticsView 
+                  data={grievanceData} 
+                  onShowToast={showToast}
+                  onOpenModal={(modal) => setActiveModal(modal)}
+                />
+              )}
+              {activeTab === 'permits' && (
+                <DepartmentPerformanceView 
+                  data={deptData} 
+                  onShowToast={showToast}
+                />
+              )}
               {activeTab === 'budget' && (
                 <>
-                  <BudgetUtilizationView data={budgetData} />
+                  <BudgetUtilizationView 
+                    data={budgetData} 
+                    onShowToast={showToast}
+                    onOpenModal={(modal) => setActiveModal(modal)}
+                  />
                   <div style={{ marginTop: '20px' }}>
-                    <RevenueTrackingView data={revenueData} />
+                    <RevenueTrackingView 
+                      data={revenueData} 
+                      onShowToast={showToast}
+                      onOpenModal={(modal) => setActiveModal(modal)}
+                    />
                   </div>
                 </>
               )}
@@ -194,12 +279,180 @@ function App() {
               {activeTab === 'command' && (
                 <GovernanceCommandView
                   onNavigateTab={(tab) => setActiveTab(tab)}
+                  onShowToast={showToast}
                 />
               )}
             </>
           )}
         </div>
       </div>
+
+      {/* Global Interactive Modal Dialog */}
+      {activeModal && (
+        <div className="modal-overlay" onClick={() => setActiveModal(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>
+                {activeModal === 'grievance' && 'File New Citizen Grievance'}
+                {activeModal === 'service' && 'Apply for Municipal Service'}
+                {activeModal === 'feedback' && 'Submit Citizen Feedback'}
+                {activeModal === 'payment' && 'Record Tax / License Payment'}
+                {activeModal === 'budget' && 'Reallocate Department Budget'}
+                {activeModal === 'logout' && 'Confirm Session Logout'}
+              </h3>
+              <button className="modal-close-btn" onClick={() => setActiveModal(null)}>×</button>
+            </div>
+
+            <form onSubmit={handleModalSubmit}>
+              <div className="modal-body">
+                {activeModal === 'grievance' && (
+                  <>
+                    <div className="modal-field">
+                      <label>Complaint Category:</label>
+                      <select required onChange={(e) => setModalForm({ ...modalForm, category: e.target.value })}>
+                        <option value="Water Leakage">Water Pipeline Leakage</option>
+                        <option value="Street Light">Street Light Fault</option>
+                        <option value="Potholes">Road Pothole / Repair</option>
+                        <option value="Garbage">Garbage Collection Delay</option>
+                      </select>
+                    </div>
+                    <div className="modal-field">
+                      <label>Ward Location:</label>
+                      <select required onChange={(e) => setModalForm({ ...modalForm, ward: e.target.value })}>
+                        <option value="Ward 1">Ward 1 (Central Commercial)</option>
+                        <option value="Ward 2">Ward 2 (North Tech Park)</option>
+                        <option value="Ward 3">Ward 3 (East Industrial)</option>
+                        <option value="Ward 4">Ward 4 (South Suburban)</option>
+                        <option value="Ward 5">Ward 5 (West Growth)</option>
+                      </select>
+                    </div>
+                    <div className="modal-field">
+                      <label>Description:</label>
+                      <textarea rows={3} placeholder="Describe the issue in detail..." required />
+                    </div>
+                  </>
+                )}
+
+                {activeModal === 'service' && (
+                  <>
+                    <div className="modal-field">
+                      <label>Service Certificate Type:</label>
+                      <select required>
+                        <option value="Birth Certificate">Birth Certificate Issuance</option>
+                        <option value="Trade License">Commercial Trade License</option>
+                        <option value="Water Connection">New Potable Water Connection</option>
+                        <option value="Building Permit">Residential Construction Permit</option>
+                      </select>
+                    </div>
+                    <div className="modal-field">
+                      <label>Applicant Full Name:</label>
+                      <input type="text" placeholder="Enter citizen name..." required />
+                    </div>
+                    <div className="modal-field">
+                      <label>Ward Location:</label>
+                      <select required>
+                        <option value="Ward 1">Ward 1</option>
+                        <option value="Ward 2">Ward 2</option>
+                        <option value="Ward 3">Ward 3</option>
+                        <option value="Ward 4">Ward 4</option>
+                        <option value="Ward 5">Ward 5</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                {activeModal === 'feedback' && (
+                  <>
+                    <div className="modal-field">
+                      <label>Citizen Name:</label>
+                      <input type="text" placeholder="Your Name (Optional)" />
+                    </div>
+                    <div className="modal-field">
+                      <label>Department:</label>
+                      <select required>
+                        <option value="Water Supply">Water Supply & Sewerage</option>
+                        <option value="Public Works">Public Works & Roads</option>
+                        <option value="Sanitation">Sanitation & Waste</option>
+                        <option value="Health">Health & Education</option>
+                      </select>
+                    </div>
+                    <div className="modal-field">
+                      <label>Rating (1 to 5 Stars):</label>
+                      <select required>
+                        <option value="5">⭐⭐⭐⭐⭐ (5/5) Excellent Service</option>
+                        <option value="4">⭐⭐⭐⭐ (4/5) Good Experience</option>
+                        <option value="3">⭐⭐⭐ (3/5) Average Resolution</option>
+                      </select>
+                    </div>
+                    <div className="modal-field">
+                      <label>Feedback Comment:</label>
+                      <textarea rows={3} placeholder="Share your experience..." required />
+                    </div>
+                  </>
+                )}
+
+                {activeModal === 'payment' && (
+                  <>
+                    <div className="modal-field">
+                      <label>Payment Source:</label>
+                      <select required>
+                        <option value="Property Tax">Property Tax Collection</option>
+                        <option value="Trade License Fee">Trade License Renewal</option>
+                        <option value="Water Tariff">Water Tariff Bill</option>
+                      </select>
+                    </div>
+                    <div className="modal-field">
+                      <label>Amount ($):</label>
+                      <input type="number" placeholder="Enter amount..." required min="1" />
+                    </div>
+                    <div className="modal-field">
+                      <label>Ward:</label>
+                      <select required>
+                        <option value="Ward 1">Ward 1</option>
+                        <option value="Ward 2">Ward 2</option>
+                        <option value="Ward 3">Ward 3</option>
+                        <option value="Ward 4">Ward 4</option>
+                        <option value="Ward 5">Ward 5</option>
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                {activeModal === 'budget' && (
+                  <>
+                    <div className="modal-field">
+                      <label>Department:</label>
+                      <select required>
+                        <option value="Public Works & Roads">Public Works & Roads</option>
+                        <option value="Water Supply">Water Supply & Sewerage</option>
+                        <option value="Sanitation & Waste">Sanitation & Waste</option>
+                        <option value="Health & Education">Health & Education</option>
+                      </select>
+                    </div>
+                    <div className="modal-field">
+                      <label>Reallocation Amount ($):</label>
+                      <input type="number" placeholder="Enter fund reallocation amount..." required min="1000" />
+                    </div>
+                  </>
+                )}
+
+                {activeModal === 'logout' && (
+                  <p style={{ color: '#cbd5e1', fontSize: '0.95rem' }}>
+                    Are you sure you want to sign out of the <strong>Municipal Admin</strong> session?
+                  </p>
+                )}
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn-secondary" onClick={() => setActiveModal(null)}>Cancel</button>
+                <button type="submit" className="btn-primary">
+                  {activeModal === 'logout' ? 'Confirm Logout' : 'Submit & Save'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

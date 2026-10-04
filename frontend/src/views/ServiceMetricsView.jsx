@@ -1,12 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BarChartComponent, LineChartComponent } from '../components/ChartComponents.jsx';
 
-export const ServiceMetricsView = ({ data }) => {
+export const ServiceMetricsView = ({ data, onShowToast, onOpenModal }) => {
+  const [activeCategory, setActiveCategory] = useState('ALL');
+
   if (!data) return <div className="loading-state">Loading Service Metrics...</div>;
 
   return (
     <div className="service-metrics-view">
-      <h3>Municipal Service Metrics & Delivery Performance</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.4rem' }}>Municipal Service Metrics & Delivery Performance</h3>
+        <button 
+          className="btn-primary" 
+          onClick={() => onOpenModal('service')}
+          style={{ backgroundColor: '#0d9488' }}
+        >
+          + Apply for New Service
+        </button>
+      </div>
+
+      {/* Service Category Filter Pills */}
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+        {['ALL', 'Water Supply', 'Road Maintenance', 'Sanitation', 'Health Services'].map((cat) => (
+          <button
+            key={cat}
+            onClick={() => {
+              setActiveCategory(cat);
+              if (onShowToast) onShowToast(`Filtered services by: ${cat}`, 'info');
+            }}
+            style={{
+              background: activeCategory === cat ? '#0d9488' : '#0f172a',
+              color: activeCategory === cat ? '#ffffff' : '#94a3b8',
+              border: '1px solid #334155',
+              padding: '6px 14px',
+              borderRadius: '999px',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
 
       <div className="top-kpi-grid">
         <div className="kpi-card">

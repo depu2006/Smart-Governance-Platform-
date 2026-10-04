@@ -226,14 +226,14 @@ public class AnalyticsController {
 
             data.put("citizenSatisfactionRating", String.format(Locale.US, "%.1f/5", sat));
             data.put("serviceSlaPercentage", sla + "%");
-            data.put("totalRevenueCollected", String.format(Locale.US, "$%.1fM", rev));
-            data.put("totalAllocatedBudget", String.format(Locale.US, "$%.1fM", alloc));
-            data.put("totalBudgetUtilized", String.format(Locale.US, "$%.1fM", util));
+            data.put("totalRevenueCollected", String.format(Locale.US, "₹%.1fM", rev));
+            data.put("totalAllocatedBudget", String.format(Locale.US, "₹%.1fM", alloc));
+            data.put("totalBudgetUtilized", String.format(Locale.US, "₹%.1fM", util));
             data.put("budgetUtilizationPercentage", "88%");
             data.put("servicesSummary", ward + ": " + String.format(Locale.US, "%.1fK requests | %d%% resolved | Avg %.1f days", totalReq / 1000.0, sla, getAvgDays(ward, dept)));
             data.put("grievancesSummary", ward + ": " + String.format(Locale.US, "%.1fK filed | %d%% resolved | MTTR %d hrs", (totalReq * 0.45) / 1000.0, sla, getMttr(ward, dept)));
-            data.put("revenueSummary", ward + ": " + String.format(Locale.US, "$%.1fM | Property Tax 68%% | Licenses 22%%", rev));
-            data.put("budgetSummary", String.format(Locale.US, "$%.1fM allocated | $%.1fM utilized | 88%%", alloc, util));
+            data.put("revenueSummary", ward + ": " + String.format(Locale.US, "₹%.1fM | Property Tax 68%% | Licenses 22%%", rev));
+            data.put("budgetSummary", String.format(Locale.US, "₹%.1fM allocated | ₹%.1fM utilized | 88%%", alloc, util));
             data.put("departmentsSummary", ward + " Water: 95% | Sanitation: 96% | Roads: 89%");
             data.put("citizenSatSummary", String.format(Locale.US, "%.1f/5 | Complaints ↓ 22%% | Services ↑ 45%%", sat));
         } else if (!"ALL".equalsIgnoreCase(dept)) {
@@ -247,14 +247,14 @@ public class AnalyticsController {
 
             data.put("citizenSatisfactionRating", String.format(Locale.US, "%.1f/5", sat));
             data.put("serviceSlaPercentage", sla + "%");
-            data.put("totalRevenueCollected", String.format(Locale.US, "$%.1fM", rev));
-            data.put("totalAllocatedBudget", String.format(Locale.US, "$%.1fM", alloc));
-            data.put("totalBudgetUtilized", String.format(Locale.US, "$%.1fM", util));
+            data.put("totalRevenueCollected", String.format(Locale.US, "₹%.1fM", rev));
+            data.put("totalAllocatedBudget", String.format(Locale.US, "₹%.1fM", alloc));
+            data.put("totalBudgetUtilized", String.format(Locale.US, "₹%.1fM", util));
             data.put("budgetUtilizationPercentage", "90%");
             data.put("servicesSummary", dept + ": " + String.format(Locale.US, "%.1fK requests | %d%% resolved | Avg %.1f days", totalReq / 1000.0, sla, getAvgDays(ward, dept)));
             data.put("grievancesSummary", dept + ": " + String.format(Locale.US, "%d filed | %d%% resolved | MTTR %d hrs", (int) Math.round(totalReq * 0.45), sla, getMttr(ward, dept)));
-            data.put("revenueSummary", dept + ": " + String.format(Locale.US, "$%.1fM collected | Operational Revenue", rev));
-            data.put("budgetSummary", String.format(Locale.US, "$%.1fM allocated | $%.1fM utilized | 90%%", alloc, util));
+            data.put("revenueSummary", dept + ": " + String.format(Locale.US, "₹%.1fM collected | Operational Revenue", rev));
+            data.put("budgetSummary", String.format(Locale.US, "₹%.1fM allocated | ₹%.1fM utilized | 90%%", alloc, util));
             data.put("departmentsSummary", dept + " SLA: " + sla + "% | Satisfaction: " + sat + "/5");
             data.put("citizenSatSummary", String.format(Locale.US, "%.1f/5 | Complaints ↓ 25%% | Services ↑ 50%%", sat));
         } else {
@@ -266,14 +266,14 @@ public class AnalyticsController {
 
             data.put("citizenSatisfactionRating", "4.7/5");
             data.put("serviceSlaPercentage", "94%");
-            data.put("totalRevenueCollected", String.format(Locale.US, "$%.1fM", rev));
-            data.put("totalAllocatedBudget", String.format(Locale.US, "$%.1fM", alloc));
-            data.put("totalBudgetUtilized", String.format(Locale.US, "$%.1fM", util));
+            data.put("totalRevenueCollected", String.format(Locale.US, "₹%.1fM", rev));
+            data.put("totalAllocatedBudget", String.format(Locale.US, "₹%.1fM", alloc));
+            data.put("totalBudgetUtilized", String.format(Locale.US, "₹%.1fM", util));
             data.put("budgetUtilizationPercentage", "87%");
             data.put("servicesSummary", String.format(Locale.US, "%.1fK requests | 94%% resolved | Avg 2.4 days", totalReq / 1000.0));
             data.put("grievancesSummary", String.format(Locale.US, "%.1fK filed | 94%% resolved | MTTR 47 hrs", (12400 * getDateFactor(dateRange)) / 1000.0));
-            data.put("revenueSummary", String.format(Locale.US, "$%.1fM | Property Tax 67%% | Licenses 23%%", rev));
-            data.put("budgetSummary", String.format(Locale.US, "$%.1fM allocated | $%.1fM utilized | 87%%", alloc, util));
+            data.put("revenueSummary", String.format(Locale.US, "₹%.1fM | Property Tax 67%% | Licenses 23%%", rev));
+            data.put("budgetSummary", String.format(Locale.US, "₹%.1fM allocated | ₹%.1fM utilized | 87%%", alloc, util));
             data.put("departmentsSummary", "Water 94% | Health 91% | Education 89%");
             data.put("citizenSatSummary", "4.7/5 | Complaints ↓ 23% | Services ↑ 47%");
         }
@@ -291,7 +291,7 @@ public class AnalyticsController {
         List<Map<String, Object>> activities = Arrays.asList(
             createActivity("ACT-01", "Grievance", !"ALL".equalsIgnoreCase(ward) ? "Street light fixed on main boulevard in " + ward : "Street Light Fault resolved in Ward 2", "Public Works", "RESOLVED", "10 mins ago"),
             createActivity("ACT-02", "Application", !"ALL".equalsIgnoreCase(ward) ? "Water meter inspection approved in " + ward : "Birth Certificate approved for Priya Sharma", "Health", "APPROVED", "25 mins ago"),
-            createActivity("ACT-03", "Revenue", !"ALL".equalsIgnoreCase(ward) ? "$24,500 Tax payment received in " + ward : "$15,000 Property Tax collected in Ward 1", "Finance", "SUCCESS", "1 hour ago")
+            createActivity("ACT-03", "Revenue", !"ALL".equalsIgnoreCase(ward) ? "₹24,500 Tax payment received in " + ward : "₹15,000 Property Tax collected in Ward 1", "Finance", "SUCCESS", "1 hour ago")
         );
         data.put("recentActivities", activities);
 

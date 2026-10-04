@@ -95,7 +95,7 @@ export const BudgetProgressComponent = ({ budgets }) => {
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '0.9rem' }}>
                 <span style={{ fontWeight: 600 }}>{b.department}</span>
                 <span>
-                  ${(b.expenditure / 1000000).toFixed(1)}M / ${(b.allocated / 1000000).toFixed(1)}M ({b.utilizationPct}%)
+                  ₹{(b.expenditure / 1000000).toFixed(1)}M / ₹{(b.allocated / 1000000).toFixed(1)}M ({b.utilizationPct}%)
                   {isOver && <span className="status-pill overdue" style={{ marginLeft: '8px' }}>OVER BUDGET</span>}
                 </span>
               </div>

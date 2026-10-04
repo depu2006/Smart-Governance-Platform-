@@ -39,7 +39,7 @@ export const WARD_DATA_STORE = {
       { category: 'Pipeline Leakage', count: 350, resolutionRate: 92 }
     ],
     activities: [
-      { id: 'ACT-W1-01', type: 'Revenue', description: '$42,000 Commercial Tax received from Central Market plaza', department: 'Finance & Tax', status: 'SUCCESS', timestamp: '8 mins ago' },
+      { id: 'ACT-W1-01', type: 'Revenue', description: '₹42,000 Commercial Tax received from Central Market plaza', department: 'Finance & Tax', status: 'SUCCESS', timestamp: '8 mins ago' },
       { id: 'ACT-W1-02', type: 'Grievance', description: 'Heritage road pavers restored near Clock Tower', department: 'Public Works & Roads', status: 'RESOLVED', timestamp: '24 mins ago' },
       { id: 'ACT-W1-03', type: 'Application', description: 'Trade License approved for Hotel Royal Heritage', department: 'Commercial Licensing', status: 'APPROVED', timestamp: '1 hour ago' }
     ]
@@ -176,7 +176,7 @@ export const WARD_DATA_STORE = {
     activities: [
       { id: 'ACT-W4-01', type: 'Service', description: 'Suburban water feeder pipeline joined to South reservoir', department: 'Water Supply', status: 'SUCCESS', timestamp: '15 mins ago' },
       { id: 'ACT-W4-02', type: 'Grievance', description: 'University avenue solar LED lighting pole connected', department: 'Public Works & Roads', status: 'RESOLVED', timestamp: '45 mins ago' },
-      { id: 'ACT-W4-03', type: 'Revenue', description: '$18,500 University campus property assessment logged', department: 'Finance & Tax', status: 'SUCCESS', timestamp: '3 hours ago' }
+      { id: 'ACT-W4-03', type: 'Revenue', description: '₹18,500 University campus property assessment logged', department: 'Finance & Tax', status: 'SUCCESS', timestamp: '3 hours ago' }
     ]
   },
 
@@ -366,14 +366,14 @@ export function getFilteredGovernanceData(filters) {
     return {
       citizenSatisfactionRating: `${satisfaction}/5`,
       serviceSlaPercentage: `${slaCompliance}%`,
-      totalRevenueCollected: `$${revenue}M`,
-      totalAllocatedBudget: `$${budgetAllocated}M`,
-      totalBudgetUtilized: `$${budgetUtilized}M`,
+      totalRevenueCollected: `₹${revenue}M`,
+      totalAllocatedBudget: `₹${budgetAllocated}M`,
+      totalBudgetUtilized: `₹${budgetUtilized}M`,
       budgetUtilizationPercentage: `${budgetPct}%`,
       servicesSummary: `${ward}${deptFilter ? ` (${deptFilter.name})` : ''}: ${(requests/1000).toFixed(1)}K requests | ${slaCompliance}% resolved | Avg ${avgDays} days`,
       grievancesSummary: `${ward}: ${(grievancesCount/1000).toFixed(1)}K filed | ${resolutionRate}% resolved | MTTR ${w.mttrHours} hrs`,
-      revenueSummary: `${ward}: $${revenue}M | Property Tax ${w.propertyTaxPct}% | Licenses ${w.licensesPct}%`,
-      budgetSummary: `$${budgetAllocated}M allocated | $${budgetUtilized}M utilized | ${budgetPct}%`,
+      revenueSummary: `${ward}: ₹${revenue}M | Property Tax ${w.propertyTaxPct}% | Licenses ${w.licensesPct}%`,
+      budgetSummary: `₹${budgetAllocated}M allocated | ₹${budgetUtilized}M utilized | ${budgetPct}%`,
       departmentsSummary: w.deptPerformance,
       citizenSatSummary: `${satisfaction}/5 | Complaints ${w.complaintTrend} | Services ${w.serviceTrend}`,
       monthlyTrends,
@@ -482,14 +482,14 @@ export function getFilteredGovernanceData(filters) {
     return {
       citizenSatisfactionRating: `${d.rating}/5`,
       serviceSlaPercentage: `${d.sla}%`,
-      totalRevenueCollected: `$${revenue}M`,
-      totalAllocatedBudget: `$${alloc}M`,
-      totalBudgetUtilized: `$${util}M`,
+      totalRevenueCollected: `₹${revenue}M`,
+      totalAllocatedBudget: `₹${alloc}M`,
+      totalBudgetUtilized: `₹${util}M`,
       budgetUtilizationPercentage: `${budgetPct}%`,
       servicesSummary: `${d.name}: ${(totalReq/1000).toFixed(1)}K requests | ${d.sla}% resolved | Avg ${d.avgDays} days`,
       grievancesSummary: `${d.name}: ${Math.round(totalReq * 0.45)} filed | ${d.resRate}% resolved | MTTR ${Math.round(d.avgDays * 16)} hrs`,
-      revenueSummary: `${d.name}: $${revenue}M collected | ${d.revShare > 0.3 ? 'Primary Revenue Driver' : 'Operational Utility Fees'}`,
-      budgetSummary: `$${alloc}M allocated | $${util}M utilized | ${budgetPct}%`,
+      revenueSummary: `${d.name}: ₹${revenue}M collected | ${d.revShare > 0.3 ? 'Primary Revenue Driver' : 'Operational Utility Fees'}`,
+      budgetSummary: `₹${alloc}M allocated | ₹${util}M utilized | ${budgetPct}%`,
       departmentsSummary: `${d.name} SLA: ${d.sla}% | Resolution: ${d.resRate}% | Rating: ${d.rating}/5`,
       citizenSatSummary: `${d.rating}/5 | Complaints ${d.complaintTrend} | Services ${d.serviceTrend}`,
       monthlyTrends,
@@ -596,14 +596,14 @@ export function getFilteredGovernanceData(filters) {
   return {
     citizenSatisfactionRating: '4.7/5',
     serviceSlaPercentage: '94%',
-    totalRevenueCollected: `$${revTotal}M`,
-    totalAllocatedBudget: `$${allocTotal}M`,
-    totalBudgetUtilized: `$${utilTotal}M`,
+    totalRevenueCollected: `₹${revTotal}M`,
+    totalAllocatedBudget: `₹${allocTotal}M`,
+    totalBudgetUtilized: `₹${utilTotal}M`,
     budgetUtilizationPercentage: '87%',
     servicesSummary: `${(reqTotal/1000).toFixed(1)}K requests | 94% resolved | Avg 2.4 days`,
     grievancesSummary: `${(12400 * dateFactor / 1000).toFixed(1)}K filed | 94% resolved | MTTR 47 hrs`,
-    revenueSummary: `$${revTotal}M | Property Tax 67% | Licenses 23%`,
-    budgetSummary: `$${allocTotal}M allocated | $${utilTotal}M utilized | 87%`,
+    revenueSummary: `₹${revTotal}M | Property Tax 67% | Licenses 23%`,
+    budgetSummary: `₹${allocTotal}M allocated | ₹${utilTotal}M utilized | 87%`,
     departmentsSummary: 'Water 94% | Health 91% | Education 89%',
     citizenSatSummary: '4.7/5 | Complaints ↓ 23% | Services ↑ 47%',
     monthlyTrends,
@@ -611,7 +611,7 @@ export function getFilteredGovernanceData(filters) {
     recentActivities: [
       { id: 'GRV-848', type: 'Grievance', description: 'Street Light Fault resolved in Ward 2', department: 'Public Works', status: 'RESOLVED', timestamp: '10 mins ago' },
       { id: 'APP-1247', type: 'Application', description: 'Birth Certificate approved for Priya Sharma', department: 'Health', status: 'APPROVED', timestamp: '25 mins ago' },
-      { id: 'REV-104', type: 'Revenue', description: '$15,000 Property Tax collected in Ward 1', department: 'Finance', status: 'SUCCESS', timestamp: '1 hour ago' },
+      { id: 'REV-104', type: 'Revenue', description: '₹15,000 Property Tax collected in Ward 1', department: 'Finance', status: 'SUCCESS', timestamp: '1 hour ago' },
       { id: 'GRV-850', type: 'Grievance', description: 'Pothole repair escalated in Ward 4', department: 'Public Works', status: 'ESCALATED', timestamp: '2 hours ago' }
     ],
     serviceData: {

@@ -71,8 +71,8 @@ public class MongoAnalyticsService {
                             .budgetUtilizationPercentage(88)
                             .servicesSummary(wards[i] + ": " + (requests[i] / 1000.0) + "K requests | " + slas[i] + "% resolved")
                             .grievancesSummary(wards[i] + ": " + (requests[i] * 0.45 / 1000.0) + "K filed | " + slas[i] + "% resolved")
-                            .revenueSummary(wards[i] + ": $" + revenues[i] + "M collected")
-                            .budgetSummary("$14.2M allocated | $12.5M utilized | 88%")
+                            .revenueSummary(wards[i] + ": ₹" + revenues[i] + "M collected")
+                            .budgetSummary("₹14.2M allocated | ₹12.5M utilized | 88%")
                             .lastUpdated(new Date())
                             .build();
 
