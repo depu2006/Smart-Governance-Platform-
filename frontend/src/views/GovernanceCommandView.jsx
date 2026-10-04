@@ -17,23 +17,23 @@ export const GovernanceCommandView = ({ onNavigateTab, onShowToast }) => {
       })
       .catch(() => {
         if (onShowToast) {
-          onShowToast('🍃 MongoDB Atlas Status: Connected to Cluster0 Cloud Database!', 'success');
+          onShowToast('🍃 Could not verify MongoDB Atlas. Check that the backend is running and try again.', 'warning');
         }
       });
   };
 
   return (
-    <div className="governance-command-view" style={{ color: '#ffffff' }}>
-      <div style={{ marginBottom: '24px', borderBottom: '1px solid #1e293b', paddingBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="governance-command-view">
+      <div className="governance-command-header">
         <div>
-          <h2 style={{ fontSize: '1.75rem', color: '#38bdf8', marginBottom: '6px' }}>
+          <h2 className="governance-command-title">
             CivicPulse Nexus — Final Integrated Platform
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '0.95rem' }}>
+          <p className="governance-command-subtitle">
             All 4 Milestones Integrated: Smart Governance, Citizen Services & Public Administration Core
           </p>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="governance-command-actions">
           <button 
             className="btn-primary" 
             onClick={handleKeycloakAudit}
@@ -54,6 +54,7 @@ export const GovernanceCommandView = ({ onNavigateTab, onShowToast }) => {
       {/* 5 Master Milestone Integrated Cards matching Reference Diagram */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '28px' }}>
         <div 
+          className="command-milestone-card"
           onClick={() => onNavigateTab('citizens')}
           style={{ backgroundColor: '#1e293b', padding: '18px', borderRadius: '8px', borderLeft: '4px solid #38bdf8', cursor: 'pointer', transition: 'transform 0.2s' }}
         >
@@ -68,6 +69,7 @@ export const GovernanceCommandView = ({ onNavigateTab, onShowToast }) => {
         </div>
 
         <div 
+          className="command-milestone-card"
           onClick={() => onNavigateTab('services')}
           style={{ backgroundColor: '#1e293b', padding: '18px', borderRadius: '8px', borderLeft: '4px solid #2dd4bf', cursor: 'pointer', transition: 'transform 0.2s' }}
         >
@@ -82,6 +84,7 @@ export const GovernanceCommandView = ({ onNavigateTab, onShowToast }) => {
         </div>
 
         <div 
+          className="command-milestone-card"
           onClick={() => onNavigateTab('budget')}
           style={{ backgroundColor: '#1e293b', padding: '18px', borderRadius: '8px', borderLeft: '4px solid #facc15', cursor: 'pointer', transition: 'transform 0.2s' }}
         >
@@ -89,13 +92,14 @@ export const GovernanceCommandView = ({ onNavigateTab, onShowToast }) => {
           <h3 style={{ fontSize: '1.1rem', margin: '6px 0 8px 0' }}>Welfare & Budget</h3>
           <p style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: 1.4 }}>
             • <strong>247K</strong> Beneficiaries Covered<br />
-            • <strong>$24.7M</strong> Disbursed Funds<br />
+            • <strong>₹2.47Cr</strong> Disbursed Funds<br />
             • <strong>87%</strong> Budget Utilized
           </p>
           <div style={{ marginTop: '10px', fontSize: '0.75rem', color: '#facc15', fontWeight: 600 }}>Click to Drill Down ➔</div>
         </div>
 
         <div 
+          className="command-milestone-card"
           onClick={() => onNavigateTab('dashboard')}
           style={{ backgroundColor: '#1e293b', padding: '18px', borderRadius: '8px', borderLeft: '4px solid #fb923c', cursor: 'pointer', transition: 'transform 0.2s' }}
         >
@@ -104,12 +108,13 @@ export const GovernanceCommandView = ({ onNavigateTab, onShowToast }) => {
           <p style={{ fontSize: '0.85rem', color: '#cbd5e1', lineHeight: 1.4 }}>
             • <strong>4.7/5</strong> Public SAT Rating<br />
             • <strong>94%</strong> Service SLA Compliance<br />
-            • <strong>$12.4M</strong> Revenue Collected
+            • <strong>₹12.4M</strong> Revenue Collected
           </p>
           <div style={{ marginTop: '10px', fontSize: '0.75rem', color: '#fb923c', fontWeight: 600 }}>Click to Drill Down ➔</div>
         </div>
 
         <div 
+          className="command-milestone-card"
           style={{ backgroundColor: '#1e293b', padding: '18px', borderRadius: '8px', borderLeft: '4px solid #a855f7' }}
         >
           <div style={{ fontSize: '0.8rem', color: '#a855f7', fontWeight: 700 }}>COMMAND CORE</div>
@@ -123,49 +128,111 @@ export const GovernanceCommandView = ({ onNavigateTab, onShowToast }) => {
         </div>
       </div>
 
-      {/* Validation Screens Framework Card */}
-      <div className="governance-kpi-box" style={{ marginBottom: '28px' }}>
-        <h3 style={{ color: '#38bdf8', marginBottom: '14px' }}>
-          🛡️ Validation Screens Framework & System Integrity
-        </h3>
-        <ul className="kpi-bullet-list" style={{ gap: '12px' }}>
-          <li>
-            <strong>Citizen Data Validation:</strong> Strict input validation on citizen registration, identity numbers (Aadhaar/SSN), mobile, and ward assignments.
-          </li>
-          <li>
-            <strong>Application Workflow Tracking:</strong> Real-time stage tracking (Submitted ➔ Officer Review ➔ SLA Check ➔ Sanctioned / Certificate Generated).
-          </li>
-          <li>
-            <strong>Service SLA Monitoring:</strong> Automatic timer monitoring with color-coded warning badges for approaching or exceeded SLA deadlines.
-          </li>
-          <li>
-            <strong>Keycloak RBAC Security:</strong> Role-Based Access Control enforcing distinct views for Citizens, Officers, Department Commissioners, and Municipal Admins.
-          </li>
-          <li>
-            <strong>Kafka Event Ordering & Audit Logging:</strong> All critical approvals and financial disbursements produce immutable event logs for compliance auditing.
-          </li>
-        </ul>
-      </div>
+      <section className="governance-kpi-box first-time-guide">
+            <h3>First-Time User Guide</h3>
+            <p className="guide-intro">Choose a milestone to see what it covers and the steps to complete common tasks.</p>
+            <div className="guide-topic-list">
+              <details className="guide-topic" open>
+                <summary>Milestone 1: Citizen Management</summary>
+                <div className="guide-topic-body">
+                  <p><strong>What it does:</strong> Keeps citizen grievances in a searchable registry so staff can review, assign, approve, or escalate requests.</p>
+                  <ol>
+                    <li>Open <strong>Citizens (M1)</strong> to review the grievance table.</li>
+                    <li>Use the filters or search field to find a ward, category, or status.</li>
+                    <li>Select <strong>+ File Grievance</strong>, enter the citizen and issue details, then submit.</li>
+                    <li>Use a row action to view details, approve, escalate, reassign, or inspect the audit information.</li>
+                  </ol>
+                  <button className="btn-primary guide-open-button" onClick={() => onNavigateTab('grievances')}>Open Citizens (M1)</button>
+                </div>
+              </details>
 
-      {/* Technology Stack & Integration Overview */}
+              <details className="guide-topic">
+                <summary>Milestone 2: Certificates and Services</summary>
+                <div className="guide-topic-body">
+                  <p><strong>What it does:</strong> Tracks municipal service and certificate applications from submission through review and approval.</p>
+                  <ol>
+                    <li>Open <strong>Services (M2)</strong> and choose <strong>+ Apply for New Service</strong>.</li>
+                    <li>Select the service type, enter the applicant name, choose a ward, and submit.</li>
+                    <li>Find the new application in the registry; it starts as Pending.</li>
+                    <li>Update its status to In Progress, Approved, or Overdue. The work stage and completion percentage update with it.</li>
+                  </ol>
+                  <button className="btn-primary guide-open-button" onClick={() => onNavigateTab('services')}>Open Services (M2)</button>
+                </div>
+              </details>
+
+              <details className="guide-topic">
+                <summary>Milestone 3: Welfare, Budget, and Revenue</summary>
+                <div className="guide-topic-body">
+                  <p><strong>What it does:</strong> Shows department allocations, spending, remaining funds, revenue collections, and recorded budget reallocations.</p>
+                  <ol>
+                    <li>Open <strong>Welfare (M3)</strong> to review the budget and revenue tables.</li>
+                    <li>Choose <strong>+ Reallocate Department Budget</strong>.</li>
+                    <li>Select the receiving department, enter an amount in rupees, and submit.</li>
+                    <li>Confirm the new reference, department, amount, and timestamp in the reallocation register.</li>
+                  </ol>
+                  <button className="btn-primary guide-open-button" onClick={() => onNavigateTab('budget')}>Open Welfare (M3)</button>
+                </div>
+              </details>
+
+              <details className="guide-topic">
+                <summary>Milestone 4: Analytics and SLA Management</summary>
+                <div className="guide-topic-body">
+                  <p><strong>What it does:</strong> Compares department workload, resolution speed, citizen ratings, and service-level agreement (SLA) compliance.</p>
+                  <ol>
+                    <li>Open <strong>Analytics (M4)</strong> and choose date, department, and ward filters.</li>
+                    <li>Review each department’s requests, pending workload, resolution rate, and SLA percentage.</li>
+                    <li>Choose <strong>Manage</strong> to record a monitoring or improvement action for a department.</li>
+                    <li>Choose <strong>Audit Department SLA</strong> to compare departments with the 90% compliance threshold; results below it are marked for review.</li>
+                  </ol>
+                  <button className="btn-primary guide-open-button" onClick={() => onNavigateTab('permits')}>Open Analytics (M4)</button>
+                </div>
+              </details>
+
+              <details className="guide-topic">
+                <summary>Command Core: Security and Data Checks</summary>
+                <div className="guide-topic-body">
+                  <p><strong>Run Keycloak RBAC Audit:</strong> Displays the platform’s role-check confirmation. RBAC means each user should only access actions allowed for their role, such as administrator, commissioner, or officer.</p>
+                  <p><strong>Verify Mongo Cloud Sync:</strong> Requests the backend’s MongoDB status endpoint and reports whether the cloud analytics connection can be verified.</p>
+                  <ol>
+                    <li>Start the backend before checking MongoDB status.</li>
+                    <li>Choose <strong>Verify Mongo Cloud Sync</strong> and read the connection result.</li>
+                    <li>Choose <strong>Run Keycloak RBAC Audit</strong> to see the role-audit confirmation.</li>
+                  </ol>
+                </div>
+              </details>
+            </div>
+          </section>
+
+          <section className="governance-kpi-box" style={{ marginBottom: '28px' }}>
+            <h3>Validation and System Integrity</h3>
+            <ul className="kpi-bullet-list" style={{ gap: '12px' }}>
+              <li><strong>Citizen data validation:</strong> Required identity, contact, and ward fields help prevent incomplete records when a citizen submits a request.</li>
+              <li><strong>Application workflow:</strong> A request moves from Submitted to Officer Review, SLA Check, and then Approved or Certificate Generated.</li>
+              <li><strong>SLA monitoring:</strong> SLA means the target time for completing a service. M4 shows compliance and highlights records needing attention.</li>
+              <li><strong>Keycloak RBAC:</strong> Role-based access control assigns permissions to citizens, officers, commissioners, and administrators.</li>
+              <li><strong>Kafka audit events:</strong> Kafka is the event stream used to order operational events, such as approvals and financial actions, for audit history.</li>
+            </ul>
+          </section>
+
+      {/* Technical Architecture */}
       <div className="data-table-card">
-        <h4>CivicPulse Nexus Technical Architecture</h4>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '14px', fontSize: '0.9rem', color: '#cbd5e1' }}>
-          <div style={{ background: '#0d131f', padding: '12px', borderRadius: '6px', border: '1px solid #1e293b' }}>
-            <strong style={{ color: '#38bdf8' }}>Frontend UI:</strong><br />
-            React, Vite, JSX, CSS3 Responsive Grid, Interactive SVG Data Visualizations
+        <h4>Technical Architecture, in Plain Language</h4>
+        <div className="architecture-guide-list">
+          <div>
+            <strong>Frontend UI</strong>
+            <p>React and JSX build the screens and controls you use. Vite serves the web app during development. CSS creates the responsive layout, and SVG draws charts.</p>
           </div>
-          <div style={{ background: '#0d131f', padding: '12px', borderRadius: '6px', border: '1px solid #1e293b' }}>
-            <strong style={{ color: '#2dd4bf' }}>Backend Framework:</strong><br />
-            Java 21, Spring Boot 3.4.13, RESTful Controllers, Lombok, Maven Wrapper
+          <div>
+            <strong>Backend Framework</strong>
+            <p>Java 21 and Spring Boot expose REST APIs that send analytics and status data to the frontend. The Maven Wrapper runs project build commands; Lombok reduces repetitive Java code.</p>
           </div>
-          <div style={{ background: '#0d131f', padding: '12px', borderRadius: '6px', border: '1px solid #1e293b' }}>
-            <strong style={{ color: '#facc15' }}>Database Layer:</strong><br />
-            MongoDB Atlas Cloud (NoSQL `ward_analytics`) + H2/PostgreSQL In-Memory (`civicpulse_db`)
+          <div>
+            <strong>Database Layer</strong>
+            <p>MongoDB Atlas stores ward analytics documents in <code>ward_analytics</code>. H2 provides a local in-memory relational database named <code>civicpulse_db</code>; PostgreSQL support is also included for deployment options.</p>
           </div>
-          <div style={{ background: '#0d131f', padding: '12px', borderRadius: '6px', border: '1px solid #1e293b' }}>
-            <strong style={{ color: '#a855f7' }}>Security & Messaging:</strong><br />
-            Keycloak RBAC, Apache Kafka Event Ordering, CORS WebConfig, Immutable Audit Trail
+          <div>
+            <strong>Security and Messaging</strong>
+            <p>Keycloak manages sign-in and role permissions. Kafka carries ordered events for workflows and auditing. CORS settings control which web origins may call the backend APIs.</p>
           </div>
         </div>
       </div>

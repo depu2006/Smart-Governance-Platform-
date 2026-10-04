@@ -10,12 +10,12 @@ import { DepartmentPerformanceView } from './views/DepartmentPerformanceView.jsx
 import { CitizenSatisfactionView } from './views/CitizenSatisfactionView.jsx';
 import { ReportsAnalyticsView } from './views/ReportsAnalyticsView.jsx';
 import { GovernanceCommandView } from './views/GovernanceCommandView.jsx';
-import { ThreeCanvas } from './components/ThreeCanvas.jsx';
+import { ThreeBackground } from './components/ThreeBackground.jsx';
+import { ActionControlModal } from './components/ActionControlModal.jsx';
 import { getFilteredGovernanceData } from './wardDataStore.js';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     dateRange: 'ALL',
     department: 'ALL',
@@ -34,9 +34,57 @@ function App() {
   const [loginEmail, setLoginEmail] = useState('civilpulse@gmail.com');
   const [loginPassword, setLoginPassword] = useState('civicpulse@123');
 
+  // Action Controls Modal & Complaints Registry State
+  const [actionModalState, setActionModalState] = useState(null);
+  const [complaintsList, setComplaintsList] = useState([
+    { id: 'GRV-2024-9102', citizenName: 'Rajesh Sharma', category: 'Water Pipeline Leakage', ward: 'Ward 1', timestamp: '10 mins ago', status: 'IN_PROGRESS', department: 'Water Supply & Sewerage', description: 'Major water leakage near Central Market Gate 2.', assignedOfficer: 'Officer Rajesh Kumar' },
+    { id: 'GRV-2024-8841', citizenName: 'Priya Verma', category: 'Road Potholes / Repair', ward: 'Ward 2', timestamp: '25 mins ago', status: 'OVERDUE', department: 'Public Works & Roads', description: 'Deep crater on Eco Tech main road.', assignedOfficer: 'Officer Priya Sharma' },
+    { id: 'GRV-2024-7412', citizenName: 'Amit Patel', category: 'Garbage Collection Delay', ward: 'Ward 3', timestamp: '1 hour ago', status: 'RESOLVED', department: 'Sanitation & Waste Management', description: 'Waste container overflow near Freight Depot.', assignedOfficer: 'Officer Amit Patel' },
+    { id: 'GRV-2024-6920', citizenName: 'Sunita Gupta', category: 'Street Light Fault', ward: 'Ward 4', timestamp: '2 hours ago', status: 'IN_PROGRESS', department: 'Public Works & Roads', description: 'Dark corridor on Suburban Link Road.', assignedOfficer: 'Officer Sunita Gupta' },
+    { id: 'GRV-2024-5819', citizenName: 'Vikram Singh', category: 'Drainage Overflow', ward: 'Ward 5', timestamp: '3 hours ago', status: 'RESOLVED', department: 'Water Supply & Sewerage', description: 'Stormwater drain blocked near West School.', assignedOfficer: 'Officer Vikram Singh' },
+  ]);
+  const [serviceApplications, setServiceApplications] = useState(() => {
+    try {
+      const savedApplications = window.localStorage.getItem('civicpulse-service-applications');
+      if (savedApplications) {
+        const parsedApplications = JSON.parse(savedApplications);
+        if (Array.isArray(parsedApplications)) return parsedApplications;
+      }
+    } catch {
+      return [];
+    }
+    return [
+      { id: 'APP-1847', applicant: 'Priya Sharma', type: 'Birth Certificate', ward: 'Ward 2', date: '2 hrs ago', status: 'APPROVED', department: 'Health & Education', progress: 100, workflowStage: 'Approved / completed' },
+      { id: 'APP-2258', applicant: 'Rohit Menon', type: 'Water Connection', ward: 'Ward 1', date: '5 hrs ago', status: 'IN_PROGRESS', department: 'Water Supply', progress: 55, workflowStage: 'Field verification' },
+      { id: 'APP-3120', applicant: 'Ananya Iyer', type: 'Trade License', ward: 'Ward 3', date: '1 day ago', status: 'PENDING', department: 'Commercial Licensing', progress: 15, workflowStage: 'Application received' },
+      { id: 'APP-4018', applicant: 'Harsh Gupta', type: 'Road Maintenance', ward: 'Ward 4', date: '2 days ago', status: 'OVERDUE', department: 'Public Works & Roads', progress: 35, workflowStage: 'SLA overdue' },
+      { id: 'APP-5421', applicant: 'Nisha Patel', type: 'Sanitation Request', ward: 'Ward 5', date: '3 days ago', status: 'APPROVED', department: 'Sanitation & Waste', progress: 100, workflowStage: 'Approved / completed' },
+    ];
+  });
+  const [budgetReallocations, setBudgetReallocations] = useState(() => {
+    try {
+      const savedReallocations = window.localStorage.getItem('civicpulse-budget-reallocations');
+      if (savedReallocations) {
+        const parsedReallocations = JSON.parse(savedReallocations);
+        if (Array.isArray(parsedReallocations)) return parsedReallocations;
+      }
+    } catch {
+      return [];
+    }
+    return [];
+  });
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', themeMode);
   }, [themeMode]);
+
+  useEffect(() => {
+    window.localStorage.setItem('civicpulse-service-applications', JSON.stringify(serviceApplications));
+  }, [serviceApplications]);
+
+  useEffect(() => {
+    window.localStorage.setItem('civicpulse-budget-reallocations', JSON.stringify(budgetReallocations));
+  }, [budgetReallocations]);
 
   // Modal and Toast State
   const [toast, setToast] = useState(null);
@@ -60,6 +108,42 @@ function App() {
     setTimeout(() => {
       setToast(null);
     }, 3800);
+  };
+
+  const handleComplaintAction = (targetItem, actionType, payload = {}) => {
+    setComplaintsList((prev) => prev.map((complaint) => {
+      if (complaint.id !== targetItem.id) return complaint;
+
+      if (actionType === 'approve') {
+        return { ...complaint, status: 'APPROVED', assignedOfficer: payload.assignedOfficer || complaint.assignedOfficer };
+      }
+
+      if (actionType === 'reassign') {
+        return {
+          ...complaint,
+          assignedOfficer: payload.assignedOfficer || complaint.assignedOfficer,
+          status: complaint.status === 'OVERDUE' ? 'IN_PROGRESS' : complaint.status,
+        };
+      }
+
+      if (actionType === 'escalate') {
+        return { ...complaint, status: 'OVERDUE' };
+      }
+
+      return complaint;
+    }));
+  };
+
+  const updateServiceApplication = (targetItem, status) => {
+    const workflow = {
+      PENDING: { progress: 15, workflowStage: 'Application received' },
+      IN_PROGRESS: { progress: 55, workflowStage: 'Verification and processing' },
+      APPROVED: { progress: 100, workflowStage: 'Approved / completed' },
+      OVERDUE: { progress: 35, workflowStage: 'SLA overdue' },
+    };
+    setServiceApplications((prev) => prev.map((application) => (
+      application.id === targetItem.id ? { ...application, status, ...workflow[status] } : application
+    )));
   };
 
   useEffect(() => {
@@ -153,15 +237,55 @@ function App() {
         return;
       }
     } else if (activeModal === 'grievance') {
-      showToast(`✓ Grievance submitted! Tracking ID: #GRV-2024-${Math.floor(1000 + Math.random() * 9000)}`, 'success');
+      const newId = `GRV-2024-${Math.floor(1000 + Math.random() * 9000)}`;
+      const newComplaint = {
+        id: newId,
+        citizenName: modalForm.citizenName || 'Verified Citizen',
+        category: modalForm.category || 'Water Pipeline Leakage',
+        ward: modalForm.ward || 'Ward 1 (Central Commercial)',
+        timestamp: 'JUST NOW',
+        status: 'PENDING_REVIEW',
+        department: 'Public Governance Core',
+        description: modalForm.description || 'New grievance registered via citizen portal.',
+        assignedOfficer: modalForm.assignedOfficer || 'Officer Rajesh Kumar (Ward 1)',
+      };
+      setComplaintsList((prev) => [newComplaint, ...prev]);
+      showToast(`✓ New Grievance #${newId} recorded! Added to active complaint registry.`, 'success');
     } else if (activeModal === 'service') {
-      showToast(`✓ Service Application registered! Reference ID: #APP-2024-${Math.floor(1000 + Math.random() * 9000)}`, 'success');
+      const newId = `APP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+      const serviceType = modalForm.serviceType || 'Birth Certificate';
+      const departmentByType = {
+        'Birth Certificate': 'Health & Education',
+        'Trade License': 'Commercial Licensing',
+        'Water Connection': 'Water Supply',
+        'Building Permit': 'Public Works & Roads',
+      };
+      const newApplication = {
+        id: newId,
+        applicant: modalForm.applicant || 'Verified Citizen',
+        type: serviceType,
+        ward: modalForm.serviceWard || 'Ward 1',
+        date: 'Just now',
+        status: 'PENDING',
+        department: departmentByType[serviceType],
+        progress: 15,
+        workflowStage: 'Application received',
+      };
+      setServiceApplications((prev) => [newApplication, ...prev]);
+      showToast(`✓ Service application #${newId} added to the M2 registry.`, 'success');
     } else if (activeModal === 'feedback') {
       showToast('✓ Citizen Feedback recorded! Thank you for rating.', 'success');
     } else if (activeModal === 'payment') {
       showToast(`✓ Payment recorded! Receipt #REC-${Math.floor(100000 + Math.random() * 900000)} generated.`, 'success');
     } else if (activeModal === 'budget') {
-      showToast('✓ Department Budget re-allocation saved successfully!', 'success');
+      const newReallocation = {
+        id: `BUD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+        department: modalForm.budgetDepartment || 'Public Works & Roads',
+        amount: Number(modalForm.budgetAmount),
+        createdAt: new Date().toLocaleString('en-IN'),
+      };
+      setBudgetReallocations((prev) => [newReallocation, ...prev]);
+      showToast(`✓ ₹${newReallocation.amount.toLocaleString('en-IN')} reallocated to ${newReallocation.department} and added to the M3 register.`, 'success');
     } else if (activeModal === 'logout') {
       setUserSession(null);
       showToast('🔒 Municipal Admin session signed out cleanly.', 'warning');
@@ -182,6 +306,9 @@ function App() {
 
   return (
     <div className="page-shell">
+      {/* Three.js Ambient 3D Geometric Node Background */}
+      <ThreeBackground themeMode={themeMode} />
+
       {/* Floating Toast Notification */}
       {toast && (
         <div className="toast-container">
@@ -211,16 +338,6 @@ function App() {
             </button>
           ))}
         </nav>
-
-        <div className="search-box">
-          <span className="search-icon">🔍</span>
-          <input 
-            type="text" 
-            placeholder="SEARCH..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
 
         <button
           className="theme-toggle-btn"
@@ -302,11 +419,11 @@ function App() {
         )}
       </header>
 
-      {/* Main Hero Showcase Banner matching reference image with Three.js 3D Globe */}
+      {/* Main Hero Showcase Banner */}
       {activeTab === 'dashboard' && (
         <div className="hero-layout">
           <div className="hero-visual" style={{ position: 'relative', overflow: 'hidden', minHeight: '360px', borderRadius: '16px' }}>
-            <ThreeCanvas />
+            <div className="hero-room-image" role="img" aria-label="Municipal city skyline" />
           </div>
           <div className="hero-copy">
             <h1>Smart Governance, Citizen First</h1>
@@ -316,7 +433,6 @@ function App() {
             <div className="tag-row">
               <span className="tag">SLA 94% MET</span>
               <span className="tag">4.7/5 CITIZEN TRUST</span>
-              <span className="tag">THREE.JS 3D GLOBE</span>
               <span className="tag">KEYCLOAK RBAC</span>
             </div>
             <div style={{ display: 'flex', gap: '12px', marginTop: '16px', flexWrap: 'wrap' }}>
@@ -372,7 +488,7 @@ function App() {
             <div className="card-number">03</div>
             <div className="card-content">
               <h2>Welfare & Budget</h2>
-              <p>M3: Public schemes covering 247K beneficiaries with $24.7M disbursed & 87% budget.</p>
+              <p>M3: Public schemes covering 247K beneficiaries with ₹2.47Cr disbursed & 87% budget.</p>
             </div>
           </div>
 
@@ -428,15 +544,20 @@ function App() {
             {activeTab === 'services' && (
               <ServiceMetricsView 
                 data={serviceData} 
+                applications={serviceApplications}
+                onUpdateApplication={updateServiceApplication}
                 onShowToast={showToast}
                 onOpenModal={(modal) => setActiveModal(modal)}
+                onOpenActionModal={(item, actionType) => setActionModalState({ item, actionType })}
               />
             )}
             {activeTab === 'grievances' && (
               <GrievanceAnalyticsView 
                 data={grievanceData} 
+                complaintsList={complaintsList}
                 onShowToast={showToast}
                 onOpenModal={(modal) => setActiveModal(modal)}
+                onOpenActionModal={(item, actionType) => setActionModalState({ item, actionType })}
               />
             )}
             {activeTab === 'permits' && (
@@ -449,6 +570,7 @@ function App() {
               <>
                 <BudgetUtilizationView 
                   data={budgetData} 
+                  reallocations={budgetReallocations}
                   onShowToast={showToast}
                   onOpenModal={(modal) => setActiveModal(modal)}
                 />
@@ -478,6 +600,23 @@ function App() {
           </>
         )}
       </main>
+
+      {actionModalState && (
+        <ActionControlModal
+          item={actionModalState.item}
+          actionType={actionModalState.actionType}
+          onClose={() => setActionModalState(null)}
+          onShowToast={showToast}
+          onActionComplete={(updatedItem, actionType, payload) => {
+            if (serviceApplications.some((application) => application.id === updatedItem.id)) {
+              updateServiceApplication(updatedItem, actionType === 'approve' ? 'APPROVED' : updatedItem.status);
+            } else {
+              handleComplaintAction(updatedItem, actionType, payload);
+            }
+            setActionModalState(null);
+          }}
+        />
+      )}
 
       {/* Global Interactive Modal Dialog */}
       {activeModal && (
@@ -559,17 +698,35 @@ function App() {
                 {activeModal === 'grievance' && (
                   <>
                     <div className="modal-field">
+                      <label>Citizen Name:</label>
+                      <input
+                        type="text"
+                        value={modalForm.citizenName || ''}
+                        onChange={(e) => setModalForm({ ...modalForm, citizenName: e.target.value })}
+                        placeholder="Enter citizen name..."
+                        required
+                      />
+                    </div>
+                    <div className="modal-field">
                       <label>Complaint Category:</label>
-                      <select required onChange={(e) => setModalForm({ ...modalForm, category: e.target.value })}>
-                        <option value="Water Leakage">Water Pipeline Leakage</option>
-                        <option value="Street Light">Street Light Fault</option>
-                        <option value="Potholes">Road Pothole / Repair</option>
-                        <option value="Garbage">Garbage Collection Delay</option>
+                      <select
+                        value={modalForm.category || 'Water Pipeline Leakage'}
+                        required
+                        onChange={(e) => setModalForm({ ...modalForm, category: e.target.value })}
+                      >
+                        <option value="Water Pipeline Leakage">Water Pipeline Leakage</option>
+                        <option value="Street Light Fault">Street Light Fault</option>
+                        <option value="Road Pothole / Repair">Road Pothole / Repair</option>
+                        <option value="Garbage Collection Delay">Garbage Collection Delay</option>
                       </select>
                     </div>
                     <div className="modal-field">
                       <label>Ward Location:</label>
-                      <select required onChange={(e) => setModalForm({ ...modalForm, ward: e.target.value })}>
+                      <select
+                        value={modalForm.ward || 'Ward 1'}
+                        required
+                        onChange={(e) => setModalForm({ ...modalForm, ward: e.target.value })}
+                      >
                         <option value="Ward 1">Ward 1 (Central Commercial)</option>
                         <option value="Ward 2">Ward 2 (North Tech Park)</option>
                         <option value="Ward 3">Ward 3 (East Industrial)</option>
@@ -579,7 +736,13 @@ function App() {
                     </div>
                     <div className="modal-field">
                       <label>Description:</label>
-                      <textarea rows={3} placeholder="Describe the issue in detail..." required />
+                      <textarea
+                        rows={3}
+                        value={modalForm.description || ''}
+                        onChange={(e) => setModalForm({ ...modalForm, description: e.target.value })}
+                        placeholder="Describe the issue in detail..."
+                        required
+                      />
                     </div>
                   </>
                 )}
@@ -588,7 +751,11 @@ function App() {
                   <>
                     <div className="modal-field">
                       <label>Service Certificate Type:</label>
-                      <select required>
+                      <select
+                        required
+                        value={modalForm.serviceType || 'Birth Certificate'}
+                        onChange={(e) => setModalForm({ ...modalForm, serviceType: e.target.value })}
+                      >
                         <option value="Birth Certificate">Birth Certificate Issuance</option>
                         <option value="Trade License">Commercial Trade License</option>
                         <option value="Water Connection">New Potable Water Connection</option>
@@ -597,11 +764,21 @@ function App() {
                     </div>
                     <div className="modal-field">
                       <label>Applicant Full Name:</label>
-                      <input type="text" placeholder="Enter citizen name..." required />
+                      <input
+                        type="text"
+                        value={modalForm.applicant || ''}
+                        onChange={(e) => setModalForm({ ...modalForm, applicant: e.target.value })}
+                        placeholder="Enter citizen name..."
+                        required
+                      />
                     </div>
                     <div className="modal-field">
                       <label>Ward Location:</label>
-                      <select required>
+                      <select
+                        required
+                        value={modalForm.serviceWard || 'Ward 1'}
+                        onChange={(e) => setModalForm({ ...modalForm, serviceWard: e.target.value })}
+                      >
                         <option value="Ward 1">Ward 1</option>
                         <option value="Ward 2">Ward 2</option>
                         <option value="Ward 3">Ward 3</option>
@@ -673,7 +850,11 @@ function App() {
                   <>
                     <div className="modal-field">
                       <label>Department:</label>
-                      <select required>
+                      <select
+                        required
+                        value={modalForm.budgetDepartment || 'Public Works & Roads'}
+                        onChange={(e) => setModalForm({ ...modalForm, budgetDepartment: e.target.value })}
+                      >
                         <option value="Public Works & Roads">Public Works & Roads</option>
                         <option value="Water Supply">Water Supply & Sewerage</option>
                         <option value="Sanitation & Waste">Sanitation & Waste</option>
@@ -681,8 +862,16 @@ function App() {
                       </select>
                     </div>
                     <div className="modal-field">
-                      <label>Reallocation Amount ($):</label>
-                      <input type="number" placeholder="Enter fund reallocation amount..." required min="1000" />
+                      <label>Reallocation Amount (₹):</label>
+                      <input
+                        type="number"
+                        value={modalForm.budgetAmount || ''}
+                        onChange={(e) => setModalForm({ ...modalForm, budgetAmount: e.target.value })}
+                        placeholder="Enter amount in rupees..."
+                        required
+                        min="1"
+                        step="1"
+                      />
                     </div>
                   </>
                 )}

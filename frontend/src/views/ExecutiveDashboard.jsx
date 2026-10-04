@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { KpiCard } from '../components/KpiCard.jsx';
 import { LineChartComponent } from '../components/ChartComponents.jsx';
 
@@ -9,6 +9,8 @@ export const ExecutiveDashboardView = ({
   onShowToast,
   onOpenModal,
 }) => {
+  const [selectedActivity, setSelectedActivity] = useState(null);
+
   if (!data) return <div className="loading-state">Loading Executive Dashboard...</div>;
 
   const handleShare = () => {
@@ -23,7 +25,7 @@ export const ExecutiveDashboardView = ({
   return (
     <div className="executive-dashboard-view">
       <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ margin: 0, fontSize: '1.5rem', color: '#ffffff' }}>Executive Dashboard & Governance Overview</h2>
+        <h2 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--ink)' }}>Executive Dashboard & Governance Overview</h2>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button 
             className="btn-primary" 
@@ -64,22 +66,24 @@ export const ExecutiveDashboardView = ({
         />
       </div>
 
-      {/* Analytics Dashboard - Governance KPIs Box (Exact match to Reference Image) */}
+      {/* Analytics Dashboard - Governance KPIs */}
       <div className="governance-kpi-box">
         <h3>Analytics Dashboard - Governance KPIs</h3>
-        <ul className="kpi-bullet-list">
-          <li><strong>Services:</strong> {data.servicesSummary || "24.7K requests | 94% resolved | Avg 2.4 days"}</li>
-          <li><strong>Grievances:</strong> {data.grievancesSummary || "12.4K filed | 94% resolved | MTTR 47 hrs"}</li>
-          <li><strong>Revenue:</strong> {data.revenueSummary || "$12.4M | Property Tax 67% | Licenses 23%"}</li>
-          <li><strong>Budget:</strong> {data.budgetSummary || "$47M allocated | 41M utilized | 87%"}</li>
-          <li><strong>Departments:</strong> {data.departmentsSummary || "Water 94% | Health 91% | Education 89%"}</li>
-          <li><strong>Citizen SAT:</strong> {data.citizenSatSummary || "4.7/5 | Complaints ↓ 23% | Services ↑ 47%"}</li>
-        </ul>
+        <div className="governance-kpi-grid">
+          <div className="governance-kpi-item"><strong>Services</strong><span>{data.servicesSummary || '24.7K requests | 94% resolved | Avg 2.4 days'}</span></div>
+          <div className="governance-kpi-item"><strong>Grievances</strong><span>{data.grievancesSummary || '12.4K filed | 94% resolved | MTTR 47 hrs'}</span></div>
+          <div className="governance-kpi-item"><strong>Revenue</strong><span>{data.revenueSummary || '₹12.4M | Property Tax 67% | Licenses 23%'}</span></div>
+          <div className="governance-kpi-item"><strong>Budget</strong><span>{data.budgetSummary || '₹47.0M allocated | ₹41.0M utilized | 87%'}</span></div>
+          <div className="governance-kpi-item"><strong>Departments</strong><span>{data.departmentsSummary || 'Water 94% | Health 91% | Education 89%'}</span></div>
+          <div className="governance-kpi-item"><strong>Citizen SAT</strong><span>{data.citizenSatSummary || '4.7/5 | Complaints ↓ 23% | Services ↑ 47%'}</span></div>
+        </div>
         <div className="kpi-action-bar">
-          <span>Actions:</span>
-          <button className="action-tag" onClick={onExportReport}>[Export Report]</button>
-          <button className="action-tag" onClick={() => onNavigateTab('reports')}>[Drill Down]</button>
-          <button className="action-tag" onClick={handleShare}>[Share]</button>
+          <span className="kpi-action-label">Actions</span>
+          <div className="kpi-action-buttons">
+            <button className="action-tag" onClick={onExportReport}>Export Report</button>
+            <button className="action-tag" onClick={() => onNavigateTab('reports')}>Drill Down</button>
+            <button className="action-tag" onClick={handleShare}>Share</button>
+          </div>
         </div>
       </div>
 
@@ -108,7 +112,7 @@ export const ExecutiveDashboardView = ({
                 </div>
                 <button 
                   style={{ background: 'transparent', border: '1px solid #334155', color: '#38bdf8', padding: '4px 8px', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer' }}
-                  onClick={() => onShowToast(`Inspecting log #${act.id}: ${act.description}`, 'info')}
+                  onClick={() => setSelectedActivity(act)}
                 >
                   View
                 </button>
@@ -117,6 +121,52 @@ export const ExecutiveDashboardView = ({
           </div>
         </div>
       </div>
+
+      {selectedActivity && (
+        <div className="modal-overlay" onClick={() => setSelectedActivity(null)}>
+          <div className="modal-content" onClick={(event) => event.stopPropagation()} style={{ maxWidth: '620px' }}>
+            <div className="modal-header">
+              <h3>{selectedActivity.type} Activity Details</h3>
+              <button className="modal-close-btn" onClick={() => setSelectedActivity(null)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div style={{ color: 'var(--ink)', fontSize: '0.9rem', lineHeight: 1.8 }}>
+                <div><strong>Activity ID:</strong> {selectedActivity.id || 'Activity record'}</div>
+                <div><strong>Event:</strong> {selectedActivity.description}</div>
+                <div><strong>Department:</strong> {selectedActivity.department || 'Not specified'}</div>
+                <div><strong>Recorded:</strong> {selectedActivity.timestamp || 'Recently'}</div>
+                <div><strong>Status:</strong> {selectedActivity.status || 'Recorded'}</div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn-secondary"
+                onClick={() => setSelectedActivity(null)}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => {
+                  const targetTab = selectedActivity.type === 'Grievance'
+                    ? 'grievances'
+                    : selectedActivity.type === 'Application'
+                      ? 'services'
+                      : selectedActivity.type === 'Revenue'
+                        ? 'budget'
+                        : 'reports';
+                  setSelectedActivity(null);
+                  onNavigateTab(targetTab);
+                }}
+              >
+                Open Related Module
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

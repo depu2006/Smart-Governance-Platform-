@@ -23,16 +23,14 @@ export const LineChartComponent = ({ data, title }) => {
   return (
     <div className="chart-card">
       {title && <h4>{title}</h4>}
-      <svg viewBox={`0 0 ${width} ${height}`} className="svg-chart">
+      <svg viewBox={`0 0 ${width} ${height}`} className="svg-chart" role="img" aria-label={title || 'Monthly service requests and resolutions'}>
         {[0.25, 0.5, 0.75, 1].map((ratio, idx) => {
           const y = height - padding - ratio * (height - 2 * padding);
-          return (
-            <line key={idx} x1={padding} y1={y} x2={width - padding} y2={y} stroke="#cbd5e1" strokeDasharray="4" />
-          );
+          return <line key={idx} x1={padding} y1={y} x2={width - padding} y2={y} stroke="var(--chart-grid)" strokeWidth="1.25" strokeDasharray="4 4" opacity="0.8" />;
         })}
 
-        <polyline fill="none" stroke="#00796b" strokeWidth="3" points={pointsRequests} />
-        <polyline fill="none" stroke="#0284c7" strokeWidth="3" points={pointsResolved} />
+        <polyline fill="none" stroke="var(--chart-requests)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" points={pointsRequests} />
+        <polyline fill="none" stroke="var(--chart-resolved)" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" points={pointsResolved} />
 
         {data.map((d, i) => {
           const x = padding + (i * (width - 2 * padding)) / (data.length - 1);
@@ -40,16 +38,16 @@ export const LineChartComponent = ({ data, title }) => {
           const yRes = height - padding - (d.resolved / maxVal) * (height - 2 * padding);
           return (
             <g key={i}>
-              <circle cx={x} cy={yReq} r="4" fill="#00796b" />
-              <circle cx={x} cy={yRes} r="4" fill="#0284c7" />
-              <text x={x} y={height - 10} textAnchor="middle" fill="#64748b" fontSize="11">{d.month}</text>
+              <circle cx={x} cy={yReq} r="5" fill="var(--chart-requests)" stroke="var(--card-bg)" strokeWidth="2" />
+              <circle cx={x} cy={yRes} r="5" fill="var(--chart-resolved)" stroke="var(--card-bg)" strokeWidth="2" />
+              <text x={x} y={height - 10} textAnchor="middle" fill="var(--chart-label)" fontSize="12" fontWeight="600">{d.month}</text>
             </g>
           );
         })}
       </svg>
-      <div style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '0.85rem' }}>
-        <span style={{ color: '#00796b', fontWeight: 600 }}>● Total Requests</span>
-        <span style={{ color: '#0284c7', fontWeight: 600 }}>● Resolved Requests</span>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginTop: '8px', fontSize: '0.85rem' }}>
+        <span style={{ color: 'var(--chart-requests)', fontWeight: 700 }}>● Total Requests</span>
+        <span style={{ color: 'var(--chart-resolved)', fontWeight: 700 }}>● Resolved Requests</span>
       </div>
     </div>
   );

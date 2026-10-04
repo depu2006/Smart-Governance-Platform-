@@ -1,12 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
+
+const formatRupees = (amount) => new Intl.NumberFormat('en-IN', {
+  style: 'currency',
+  currency: 'INR',
+  maximumFractionDigits: 0,
+}).format(amount || 0);
 
 export const RevenueTrackingView = ({ data, onShowToast, onOpenModal }) => {
+  const [auditedSource, setAuditedSource] = useState(null);
+
   if (!data) return <div className="loading-state">Loading Revenue Tracking...</div>;
+
+  const sourceCollectionRate = auditedSource?.target
+    ? (auditedSource.amount / auditedSource.target) * 100
+    : 0;
+  const sourceTargetMet = sourceCollectionRate >= 100;
+
+  const exportWardLedger = (wardRecord) => {
+    const averagePerReceipt = wardRecord.totalCount
+      ? Math.round(wardRecord.amount / wardRecord.totalCount)
+      : 0;
+    const csvRows = [
+      ['Ward', 'Transactions', 'Total Collected (INR)', 'Average Collection per Receipt (INR)'],
+      [wardRecord.ward, wardRecord.totalCount, wardRecord.amount, averagePerReceipt],
+    ];
+    const csvContent = csvRows
+      .map((csvRow) => csvRow.map((value) => `"${String(value).replace(/"/g, '""')}"`).join(','))
+      .join('\r\n');
+    const downloadUrl = URL.createObjectURL(new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }));
+    const downloadLink = document.createElement('a');
+    downloadLink.href = downloadUrl;
+    downloadLink.download = `${wardRecord.ward.replace(/\s+/g, '_')}_revenue_ledger.csv`;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+    URL.revokeObjectURL(downloadUrl);
+    onShowToast?.(`Receipt ledger downloaded for ${wardRecord.ward}.`, 'success');
+  };
 
   return (
     <div className="revenue-tracking-view">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h3 style={{ margin: 0, color: '#ffffff', fontSize: '1.4rem' }}>Revenue Tracking & Collection Analysis</h3>
+        <h3 style={{ margin: 0, color: 'var(--ink)', fontSize: '1.4rem' }}>Revenue Tracking & Collection Analysis</h3>
         <button 
           className="btn-primary" 
           onClick={() => onOpenModal('payment')}
@@ -19,12 +54,12 @@ export const RevenueTrackingView = ({ data, onShowToast, onOpenModal }) => {
       <div className="top-kpi-grid">
         <div className="kpi-card">
           <div className="kpi-title">Total Revenue Collected</div>
-          <div className="kpi-value">${(data.totalRevenueCollected / 1000000).toFixed(1)}M</div>
+          <div className="kpi-value">{formatRupees(data.totalRevenueCollected)}</div>
           <div className="kpi-subtitle">Collected YTD</div>
         </div>
         <div className="kpi-card">
           <div className="kpi-title">Annual Revenue Target</div>
-          <div className="kpi-value">${(data.totalRevenueTarget / 1000000).toFixed(1)}M</div>
+          <div className="kpi-value">{formatRupees(data.totalRevenueTarget)}</div>
           <div className="kpi-subtitle">Target FY 2024</div>
         </div>
         <div className="kpi-card">
@@ -34,7 +69,7 @@ export const RevenueTrackingView = ({ data, onShowToast, onOpenModal }) => {
         </div>
         <div className="kpi-card">
           <div className="kpi-title">Pending Payments</div>
-          <div className="kpi-value">${(data.pendingPayments / 1000000).toFixed(1)}M</div>
+          <div className="kpi-value">{formatRupees(data.pendingPayments)}</div>
           <div className="kpi-trend warning">Outstanding Dues</div>
         </div>
       </div>
@@ -46,8 +81,8 @@ export const RevenueTrackingView = ({ data, onShowToast, onOpenModal }) => {
             <thead>
               <tr>
                 <th>Source</th>
-                <th>Collected ($)</th>
-                <th>Target ($)</th>
+                <th>Collected (INR)</th>
+                <th>Target (INR)</th>
                 <th>Share (%)</th>
                 <th>Action</th>
               </tr>
@@ -56,13 +91,13 @@ export const RevenueTrackingView = ({ data, onShowToast, onOpenModal }) => {
               {data.revenueBySource && data.revenueBySource.map((src, idx) => (
                 <tr key={idx}>
                   <td><strong>{src.source}</strong></td>
-                  <td>${src.amount.toLocaleString()}</td>
-                  <td>${src.target.toLocaleString()}</td>
+                  <td>{formatRupees(src.amount)}</td>
+                  <td>{formatRupees(src.target)}</td>
                   <td><span className="status-pill good">{src.percentageShare}%</span></td>
                   <td>
                     <button 
-                      style={{ background: 'transparent', border: '1px solid #334155', color: '#38bdf8', padding: '4px 8px', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer' }}
-                      onClick={() => onShowToast(`Inspecting tax audit trail for ${src.source}`, 'info')}
+                      className="revenue-source-audit"
+                      onClick={() => setAuditedSource(src)}
                     >
                       Audit
                     </button>
@@ -80,7 +115,7 @@ export const RevenueTrackingView = ({ data, onShowToast, onOpenModal }) => {
               <tr>
                 <th>Ward</th>
                 <th>Transactions</th>
-                <th>Total Collected ($)</th>
+                <th>Total Collected (INR)</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -89,11 +124,11 @@ export const RevenueTrackingView = ({ data, onShowToast, onOpenModal }) => {
                 <tr key={idx}>
                   <td><strong>{w.ward}</strong></td>
                   <td>{w.totalCount} Receipts</td>
-                  <td>${w.amount.toLocaleString()}</td>
+                  <td>{formatRupees(w.amount)}</td>
                   <td>
-                    <button 
-                      style={{ background: 'transparent', border: '1px solid #334155', color: '#4ade80', padding: '4px 8px', borderRadius: '4px', fontSize: '0.72rem', cursor: 'pointer' }}
-                      onClick={() => onShowToast(`✓ Receipt ledger exported for ${w.ward}`, 'success')}
+                    <button
+                      className="revenue-ledger-button"
+                      onClick={() => exportWardLedger(w)}
                     >
                       Ledger
                     </button>
@@ -104,6 +139,38 @@ export const RevenueTrackingView = ({ data, onShowToast, onOpenModal }) => {
           </table>
         </div>
       </div>
+
+      {auditedSource && (
+        <div className="modal-overlay" onClick={() => setAuditedSource(null)}>
+          <div className="modal-content" onClick={(event) => event.stopPropagation()} style={{ maxWidth: '620px' }}>
+            <div className="modal-header">
+              <h3>Revenue Audit: {auditedSource.source}</h3>
+              <button className="modal-close-btn" onClick={() => setAuditedSource(null)}>×</button>
+            </div>
+            <div className="modal-body">
+              <p style={{ margin: 0, color: 'var(--muted)' }}>
+                Audit compares collected revenue with the annual target for this source.
+              </p>
+              <table className="analytics-table">
+                <tbody>
+                  <tr><th>Collected</th><td>{formatRupees(auditedSource.amount)}</td></tr>
+                  <tr><th>Annual Target</th><td>{formatRupees(auditedSource.target)}</td></tr>
+                  <tr><th>Remaining to Target</th><td>{formatRupees(Math.max(0, auditedSource.target - auditedSource.amount))}</td></tr>
+                  <tr><th>Collection Rate</th><td>{sourceCollectionRate.toFixed(1)}%</td></tr>
+                  <tr><th>Revenue Share</th><td>{auditedSource.percentageShare}%</td></tr>
+                  <tr>
+                    <th>Audit Result</th>
+                    <td><span className={`status-pill ${sourceTargetMet ? 'good' : 'pending'}`}>{sourceTargetMet ? 'TARGET MET' : 'TARGET NOT MET'}</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn-primary" onClick={() => setAuditedSource(null)}>Close Audit</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
