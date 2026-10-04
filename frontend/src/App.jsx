@@ -14,6 +14,7 @@ import { getFilteredGovernanceData } from './wardDataStore.js';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     dateRange: 'ALL',
     department: 'ALL',
@@ -23,7 +24,7 @@ function App() {
 
   // Modal and Toast State
   const [toast, setToast] = useState(null);
-  const [activeModal, setActiveModal] = useState(null); // 'grievance', 'service', 'feedback', 'payment', 'budget', 'logout'
+  const [activeModal, setActiveModal] = useState(null);
   const [modalForm, setModalForm] = useState({});
 
   // Initialize with dynamic calculation
@@ -45,7 +46,6 @@ function App() {
     }, 3800);
   };
 
-  // Update dynamic state when filters change
   useEffect(() => {
     const dynamicFilteredData = getFilteredGovernanceData(filters);
     setExecData(dynamicFilteredData);
@@ -125,7 +125,7 @@ function App() {
   const handleModalSubmit = (e) => {
     e.preventDefault();
     if (activeModal === 'grievance') {
-      showToast(`✓ Grievance submitted successfully! Tracking ID: #GRV-2024-${Math.floor(1000 + Math.random() * 9000)}`, 'success');
+      showToast(`✓ Grievance submitted! Tracking ID: #GRV-2024-${Math.floor(1000 + Math.random() * 9000)}`, 'success');
     } else if (activeModal === 'service') {
       showToast(`✓ Service Application registered! Reference ID: #APP-2024-${Math.floor(1000 + Math.random() * 9000)}`, 'success');
     } else if (activeModal === 'feedback') {
@@ -143,17 +143,16 @@ function App() {
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard' },
-    { id: 'citizens', label: 'Citizens' },
-    { id: 'services', label: 'Services' },
-    { id: 'grievances', label: 'Grievances' },
-    { id: 'permits', label: 'Permits' },
-    { id: 'budget', label: 'Budget' },
+    { id: 'grievances', label: 'Citizens (M1)' },
+    { id: 'services', label: 'Services (M2)' },
+    { id: 'budget', label: 'Welfare (M3)' },
+    { id: 'permits', label: 'Analytics (M4)' },
+    { id: 'command', label: 'Command Core' },
     { id: 'reports', label: 'Reports' },
-    { id: 'command', label: 'Governance Command' },
   ];
 
   return (
-    <div className="app-container">
+    <div className="page-shell">
       {/* Floating Toast Notification */}
       {toast && (
         <div className="toast-container">
@@ -163,16 +162,17 @@ function App() {
         </div>
       )}
 
-      {/* Sidebar */}
-      <div className="sidebar">
-        <h2 className="logo" onClick={() => setActiveTab('command')} style={{ cursor: 'pointer' }}>
-          🏛️ CivicPulse Nexus
-        </h2>
-        <nav>
+      {/* Top Header Bar matching reference image */}
+      <header className="topbar">
+        <div className="brand" onClick={() => setActiveTab('dashboard')}>
+          🏛️ CIVICPULSE NEXUS
+        </div>
+
+        <nav className="nav">
           {navItems.map((item) => (
             <button
               key={item.id}
-              className={activeTab === item.id ? 'active' : ''}
+              className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
               onClick={() => {
                 setActiveTab(item.id);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -182,110 +182,183 @@ function App() {
             </button>
           ))}
         </nav>
-      </div>
 
-      <div className="main-content">
-        <header className="app-header">
-          <div className="header-left">
-            <span className="brand-title">CivicPulse Nexus</span>
-          </div>
-          <div className="header-center">
-            <span className="milestone-badge">Final Integrated Platform</span>
-          </div>
-          <div className="header-right">
-            <span className="user-role">Municipal Admin</span>
-            <button className="logout-btn" onClick={() => setActiveModal('logout')}>Logout</button>
-          </div>
-        </header>
-
-        <div className="dashboard-content">
-          <FilterBar
-            filters={filters}
-            onFilterChange={(newFilters) => {
-              setFilters(newFilters);
-              showToast(`Filters updated: ${newFilters.department} | ${newFilters.ward} | ${newFilters.dateRange}`, 'info');
-            }}
-            onExportCsv={handleExportCsv}
-            onExportPdf={handleExportPdf}
+        <div className="search-box">
+          <span className="search-icon">🔍</span>
+          <input 
+            type="text" 
+            placeholder="SEARCH..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
+        </div>
+      </header>
 
-          {loading ? (
-            <div className="loading-spinner-container">
-              <div className="spinner"></div>
-              <p>Fetching Governance Analytics from Database...</p>
+      {/* Main Hero Showcase Banner matching reference image */}
+      {activeTab === 'dashboard' && (
+        <div className="hero-layout">
+          <div className="hero-visual">
+            <div className="hero-room-image"></div>
+          </div>
+          <div className="hero-copy">
+            <h1>Smart Governance, Citizen First</h1>
+            <p>
+              Empowering <strong>2.4M citizens</strong> across municipal administration with real-time analytics, automated certificate issuance, welfare distribution, and transparent public governance.
+            </p>
+            <div className="tag-row">
+              <span className="tag">SLA 94% MET</span>
+              <span className="tag">4.7/5 CITIZEN TRUST</span>
+              <span className="tag">MONGODB ATLAS CLOUD</span>
+              <span className="tag">KEYCLOAK RBAC</span>
             </div>
-          ) : (
-            <>
-              {activeTab === 'dashboard' && (
-                <ExecutiveDashboardView
-                  data={execData}
-                  onNavigateTab={(tab) => setActiveTab(tab)}
-                  onExportReport={handleExportPdf}
+            <button className="cta-button" onClick={() => setActiveTab('command')}>
+              EXPLORE PLATFORM COMMAND <span>➔</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Numbered Module Grid Cards matching reference image (01, 02, 03, 04) */}
+      {activeTab === 'dashboard' && (
+        <div className="product-grid">
+          <div 
+            className="product-card" 
+            onClick={() => setActiveTab('grievances')}
+            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=600&q=80')` }}
+          >
+            <div className="card-number">01</div>
+            <div className="card-content">
+              <h2>Citizen Management</h2>
+              <p>M1: Grievances & 2.4M citizens. 94% resolution rate across 12.4K complaints/mo.</p>
+            </div>
+          </div>
+
+          <div 
+            className="product-card" 
+            onClick={() => setActiveTab('services')}
+            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80')` }}
+          >
+            <div className="card-number">02</div>
+            <div className="card-content">
+              <h2>Certificate Management</h2>
+              <p>M2: Automated services with 847K issued certificates & 2.4 days avg SLA.</p>
+            </div>
+          </div>
+
+          <div 
+            className="product-card" 
+            onClick={() => setActiveTab('budget')}
+            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=600&q=80')` }}
+          >
+            <div className="card-number">03</div>
+            <div className="card-content">
+              <h2>Welfare & Budget</h2>
+              <p>M3: Public schemes covering 247K beneficiaries with $24.7M disbursed & 87% budget.</p>
+            </div>
+          </div>
+
+          <div 
+            className="product-card" 
+            onClick={() => setActiveTab('permits')}
+            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=600&q=80')` }}
+          >
+            <div className="card-number">04</div>
+            <div className="card-content">
+              <h2>Governance Analytics</h2>
+              <p>M4: Real-time dashboard with 4.7/5 public SAT, 94% SLA & $12.4M revenue.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main View Area */}
+      <main className="dashboard-content" style={{ padding: 0 }}>
+        <FilterBar
+          filters={filters}
+          onFilterChange={(newFilters) => {
+            setFilters(newFilters);
+            showToast(`Filters updated: ${newFilters.department} | ${newFilters.ward} | ${newFilters.dateRange}`, 'info');
+          }}
+          onExportCsv={handleExportCsv}
+          onExportPdf={handleExportPdf}
+        />
+
+        {loading ? (
+          <div className="loading-spinner-container">
+            <div className="spinner"></div>
+            <p>Fetching Governance Analytics from Database...</p>
+          </div>
+        ) : (
+          <>
+            {activeTab === 'dashboard' && (
+              <ExecutiveDashboardView
+                data={execData}
+                onNavigateTab={(tab) => setActiveTab(tab)}
+                onExportReport={handleExportPdf}
+                onShowToast={showToast}
+                onOpenModal={(modal) => setActiveModal(modal)}
+              />
+            )}
+            {activeTab === 'citizens' && (
+              <CitizenSatisfactionView 
+                data={satisfactionData} 
+                onShowToast={showToast}
+                onOpenModal={(modal) => setActiveModal(modal)}
+              />
+            )}
+            {activeTab === 'services' && (
+              <ServiceMetricsView 
+                data={serviceData} 
+                onShowToast={showToast}
+                onOpenModal={(modal) => setActiveModal(modal)}
+              />
+            )}
+            {activeTab === 'grievances' && (
+              <GrievanceAnalyticsView 
+                data={grievanceData} 
+                onShowToast={showToast}
+                onOpenModal={(modal) => setActiveModal(modal)}
+              />
+            )}
+            {activeTab === 'permits' && (
+              <DepartmentPerformanceView 
+                data={deptData} 
+                onShowToast={showToast}
+              />
+            )}
+            {activeTab === 'budget' && (
+              <>
+                <BudgetUtilizationView 
+                  data={budgetData} 
                   onShowToast={showToast}
                   onOpenModal={(modal) => setActiveModal(modal)}
                 />
-              )}
-              {activeTab === 'citizens' && (
-                <CitizenSatisfactionView 
-                  data={satisfactionData} 
-                  onShowToast={showToast}
-                  onOpenModal={(modal) => setActiveModal(modal)}
-                />
-              )}
-              {activeTab === 'services' && (
-                <ServiceMetricsView 
-                  data={serviceData} 
-                  onShowToast={showToast}
-                  onOpenModal={(modal) => setActiveModal(modal)}
-                />
-              )}
-              {activeTab === 'grievances' && (
-                <GrievanceAnalyticsView 
-                  data={grievanceData} 
-                  onShowToast={showToast}
-                  onOpenModal={(modal) => setActiveModal(modal)}
-                />
-              )}
-              {activeTab === 'permits' && (
-                <DepartmentPerformanceView 
-                  data={deptData} 
-                  onShowToast={showToast}
-                />
-              )}
-              {activeTab === 'budget' && (
-                <>
-                  <BudgetUtilizationView 
-                    data={budgetData} 
+                <div style={{ marginTop: '24px' }}>
+                  <RevenueTrackingView 
+                    data={revenueData} 
                     onShowToast={showToast}
                     onOpenModal={(modal) => setActiveModal(modal)}
                   />
-                  <div style={{ marginTop: '20px' }}>
-                    <RevenueTrackingView 
-                      data={revenueData} 
-                      onShowToast={showToast}
-                      onOpenModal={(modal) => setActiveModal(modal)}
-                    />
-                  </div>
-                </>
-              )}
-              {activeTab === 'reports' && (
-                <ReportsAnalyticsView
-                  data={execData}
-                  filters={filters}
-                  onExportCsv={handleExportCsv}
-                  onExportPdf={handleExportPdf}
-                />
-              )}
-              {activeTab === 'command' && (
-                <GovernanceCommandView
-                  onNavigateTab={(tab) => setActiveTab(tab)}
-                  onShowToast={showToast}
-                />
-              )}
-            </>
-          )}
-        </div>
-      </div>
+                </div>
+              </>
+            )}
+            {activeTab === 'reports' && (
+              <ReportsAnalyticsView
+                data={execData}
+                filters={filters}
+                onExportCsv={handleExportCsv}
+                onExportPdf={handleExportPdf}
+              />
+            )}
+            {activeTab === 'command' && (
+              <GovernanceCommandView
+                onNavigateTab={(tab) => setActiveTab(tab)}
+                onShowToast={showToast}
+              />
+            )}
+          </>
+        )}
+      </main>
 
       {/* Global Interactive Modal Dialog */}
       {activeModal && (
@@ -437,7 +510,7 @@ function App() {
                 )}
 
                 {activeModal === 'logout' && (
-                  <p style={{ color: '#cbd5e1', fontSize: '0.95rem' }}>
+                  <p style={{ color: 'var(--ink)', fontSize: '0.95rem' }}>
                     Are you sure you want to sign out of the <strong>Municipal Admin</strong> session?
                   </p>
                 )}
