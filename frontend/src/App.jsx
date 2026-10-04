@@ -9,6 +9,7 @@ import { BudgetUtilizationView } from './views/BudgetUtilizationView.jsx';
 import { DepartmentPerformanceView } from './views/DepartmentPerformanceView.jsx';
 import { CitizenSatisfactionView } from './views/CitizenSatisfactionView.jsx';
 import { ReportsAnalyticsView } from './views/ReportsAnalyticsView.jsx';
+import { GovernanceCommandView } from './views/GovernanceCommandView.jsx';
 import { getFilteredGovernanceData } from './wardDataStore.js';
 
 function App() {
@@ -34,7 +35,6 @@ function App() {
 
   // Immediately update dynamic state when filters change, then sync with backend
   useEffect(() => {
-    // 1. Instant client-side dynamic calculation from stored Ward data (guarantees graphs and numbers change immediately)
     const dynamicFilteredData = getFilteredGovernanceData(filters);
     setExecData(dynamicFilteredData);
     setServiceData(dynamicFilteredData.serviceData);
@@ -44,7 +44,6 @@ function App() {
     setDeptData(dynamicFilteredData.deptData);
     setSatisfactionData(dynamicFilteredData.satisfactionData);
 
-    // 2. Asynchronous backend sync with Spring Boot / MongoDB endpoints
     const queryParams = new URLSearchParams({
       department: filters.department,
       ward: filters.ward,
@@ -117,6 +116,7 @@ function App() {
     { id: 'permits', label: 'Permits' },
     { id: 'budget', label: 'Budget' },
     { id: 'reports', label: 'Reports' },
+    { id: 'command', label: 'Governance Command' },
   ];
 
   return (
@@ -142,7 +142,7 @@ function App() {
             <span className="brand-title">CivicPulse Nexus</span>
           </div>
           <div className="header-center">
-            <span className="milestone-badge">Milestone 4: Governance Analytics</span>
+            <span className="milestone-badge">Final Integrated Platform</span>
           </div>
           <div className="header-right">
             <span className="user-role">Municipal Admin | Logout</span>
@@ -189,6 +189,11 @@ function App() {
                   filters={filters}
                   onExportCsv={handleExportCsv}
                   onExportPdf={handleExportPdf}
+                />
+              )}
+              {activeTab === 'command' && (
+                <GovernanceCommandView
+                  onNavigateTab={(tab) => setActiveTab(tab)}
                 />
               )}
             </>
