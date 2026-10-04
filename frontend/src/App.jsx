@@ -10,6 +10,7 @@ import { DepartmentPerformanceView } from './views/DepartmentPerformanceView.jsx
 import { CitizenSatisfactionView } from './views/CitizenSatisfactionView.jsx';
 import { ReportsAnalyticsView } from './views/ReportsAnalyticsView.jsx';
 import { GovernanceCommandView } from './views/GovernanceCommandView.jsx';
+import { ThreeCanvas } from './components/ThreeCanvas.jsx';
 import { getFilteredGovernanceData } from './wardDataStore.js';
 
 function App() {
@@ -21,6 +22,21 @@ function App() {
     ward: 'ALL',
     category: 'ALL',
   });
+
+  const [themeMode, setThemeMode] = useState('dark');
+
+  // Authentication & Session State
+  const [userSession, setUserSession] = useState({
+    email: 'civilpulse@gmail.com',
+    name: 'Municipal Commissioner',
+    role: 'KEYCLOAK_ADMIN',
+  });
+  const [loginEmail, setLoginEmail] = useState('civilpulse@gmail.com');
+  const [loginPassword, setLoginPassword] = useState('civicpulse@123');
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', themeMode);
+  }, [themeMode]);
 
   // Modal and Toast State
   const [toast, setToast] = useState(null);
@@ -124,7 +140,19 @@ function App() {
 
   const handleModalSubmit = (e) => {
     e.preventDefault();
-    if (activeModal === 'grievance') {
+    if (activeModal === 'login') {
+      if (loginEmail === 'civilpulse@gmail.com' && loginPassword === 'civicpulse@123') {
+        setUserSession({
+          email: 'civilpulse@gmail.com',
+          name: 'Municipal Commissioner',
+          role: 'KEYCLOAK_ADMIN',
+        });
+        showToast('🔓 Keycloak Auth Successful! Signed in as civilpulse@gmail.com', 'success');
+      } else {
+        showToast('❌ Invalid Login! Required: civilpulse@gmail.com & civicpulse@123', 'warning');
+        return;
+      }
+    } else if (activeModal === 'grievance') {
       showToast(`✓ Grievance submitted! Tracking ID: #GRV-2024-${Math.floor(1000 + Math.random() * 9000)}`, 'success');
     } else if (activeModal === 'service') {
       showToast(`✓ Service Application registered! Reference ID: #APP-2024-${Math.floor(1000 + Math.random() * 9000)}`, 'success');
@@ -135,6 +163,7 @@ function App() {
     } else if (activeModal === 'budget') {
       showToast('✓ Department Budget re-allocation saved successfully!', 'success');
     } else if (activeModal === 'logout') {
+      setUserSession(null);
       showToast('🔒 Municipal Admin session signed out cleanly.', 'warning');
     }
     setActiveModal(null);
@@ -192,13 +221,92 @@ function App() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+
+        <button
+          className="theme-toggle-btn"
+          onClick={() => setThemeMode((prev) => (prev === 'dark' ? 'light' : 'dark'))}
+          title="Toggle Dark/Light Mode"
+          style={{
+            background: 'var(--card-bg)',
+            border: '1px solid var(--border-color)',
+            color: 'var(--ink)',
+            padding: '7px 14px',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: '600',
+            fontSize: '12px',
+            letterSpacing: '0.5px',
+            marginLeft: '10px',
+            transition: 'all 0.2s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+          }}
+        >
+          {themeMode === 'dark' ? '☀️ LIGHT MODE' : '🌙 DARK MODE'}
+        </button>
+
+        {!userSession ? (
+          <button
+            className="login-btn"
+            onClick={() => setActiveModal('login')}
+            style={{
+              background: 'var(--button-dark)',
+              color: 'var(--button-text)',
+              border: 'none',
+              padding: '7px 16px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '12px',
+              marginLeft: '8px',
+              letterSpacing: '0.5px',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            🔑 LOG IN
+          </button>
+        ) : (
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              marginLeft: '8px',
+              background: 'rgba(45, 212, 191, 0.12)',
+              border: '1px solid var(--accent-teal)',
+              padding: '5px 12px',
+              borderRadius: '6px',
+              color: 'var(--ink)',
+              fontSize: '12px',
+              fontWeight: '600',
+            }}
+          >
+            <span>🛡️ civilpulse@gmail.com</span>
+            <button
+              onClick={() => setActiveModal('logout')}
+              title="Sign Out"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#f87171',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '11px',
+                marginLeft: '4px',
+              }}
+            >
+              [EXIT]
+            </button>
+          </div>
+        )}
       </header>
 
-      {/* Main Hero Showcase Banner matching reference image */}
+      {/* Main Hero Showcase Banner matching reference image with Three.js 3D Globe */}
       {activeTab === 'dashboard' && (
         <div className="hero-layout">
-          <div className="hero-visual">
-            <div className="hero-room-image"></div>
+          <div className="hero-visual" style={{ position: 'relative', overflow: 'hidden', minHeight: '360px', borderRadius: '16px' }}>
+            <ThreeCanvas />
           </div>
           <div className="hero-copy">
             <h1>Smart Governance, Citizen First</h1>
@@ -208,12 +316,23 @@ function App() {
             <div className="tag-row">
               <span className="tag">SLA 94% MET</span>
               <span className="tag">4.7/5 CITIZEN TRUST</span>
-              <span className="tag">MONGODB ATLAS CLOUD</span>
+              <span className="tag">THREE.JS 3D GLOBE</span>
               <span className="tag">KEYCLOAK RBAC</span>
             </div>
-            <button className="cta-button" onClick={() => setActiveTab('command')}>
-              EXPLORE PLATFORM COMMAND <span>➔</span>
-            </button>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '16px', flexWrap: 'wrap' }}>
+              <button className="cta-button" onClick={() => setActiveTab('command')}>
+                EXPLORE PLATFORM COMMAND <span>➔</span>
+              </button>
+              {!userSession && (
+                <button
+                  className="cta-button"
+                  style={{ background: 'var(--card-bg)', border: '1px solid var(--border-color)', color: 'var(--ink)' }}
+                  onClick={() => setActiveModal('login')}
+                >
+                  🔑 LOGIN ADMIN (civilpulse@gmail.com)
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -366,6 +485,7 @@ function App() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>
+                {activeModal === 'login' && '🔑 Keycloak Admin Login'}
                 {activeModal === 'grievance' && 'File New Citizen Grievance'}
                 {activeModal === 'service' && 'Apply for Municipal Service'}
                 {activeModal === 'feedback' && 'Submit Citizen Feedback'}
@@ -378,6 +498,64 @@ function App() {
 
             <form onSubmit={handleModalSubmit}>
               <div className="modal-body">
+                {activeModal === 'login' && (
+                  <>
+                    <div className="modal-field">
+                      <label>Municipal Email / ID:</label>
+                      <input
+                        type="email"
+                        value={loginEmail}
+                        onChange={(e) => setLoginEmail(e.target.value)}
+                        placeholder="civilpulse@gmail.com"
+                        required
+                      />
+                    </div>
+                    <div className="modal-field">
+                      <label>Security Password:</label>
+                      <input
+                        type="password"
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        placeholder="civicpulse@123"
+                        required
+                      />
+                    </div>
+                    <div
+                      className="modal-field"
+                      style={{
+                        background: 'rgba(56, 189, 248, 0.08)',
+                        padding: '12px',
+                        borderRadius: '8px',
+                        border: '1px solid rgba(56, 189, 248, 0.25)',
+                      }}
+                    >
+                      <span style={{ fontSize: '11px', color: 'var(--muted)', display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                        🔒 Keycloak OAuth 2.0 / OIDC Identity Provider
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLoginEmail('civilpulse@gmail.com');
+                          setLoginPassword('civicpulse@123');
+                          showToast('⚡ Authorized Credentials Auto-filled!', 'info');
+                        }}
+                        style={{
+                          background: 'var(--button-dark)',
+                          color: 'var(--button-text)',
+                          border: 'none',
+                          padding: '6px 12px',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          fontSize: '11px',
+                          fontWeight: '700',
+                        }}
+                      >
+                        ⚡ Auto-Fill Authorized Admin Credentials
+                      </button>
+                    </div>
+                  </>
+                )}
+
                 {activeModal === 'grievance' && (
                   <>
                     <div className="modal-field">

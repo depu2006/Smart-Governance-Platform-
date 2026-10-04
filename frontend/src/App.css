@@ -1,21 +1,41 @@
-/* CivicPulse Nexus - Hanover & Tyke Inspired Aesthetic Design System */
-:root {
-  --page-bg: #e8ded2;
-  --panel-bg: #f5eee6;
-  --card-bg: #e3d4c3;
-  --ink: #2b231f;
-  --muted: #6e6056;
-  --button-dark: #2d2624;
-  --button-hover: #1f1917;
-  --accent-gold: #c29b68;
-  --accent-teal: #0d9488;
-  --accent-cyan: #0284c7;
-  --accent-green: #16a34a;
-  --accent-red: #dc2626;
-  --light-white: #ffffff;
-  --line-border: rgba(43, 35, 31, 0.12);
-  --shadow-soft: 0 16px 36px rgba(43, 35, 31, 0.1);
-  --shadow-hover: 0 22px 42px rgba(43, 35, 31, 0.18);
+/* CivicPulse Nexus - Unified Theme System (Full-Page Light & Dark Modes) */
+
+/* Default Full Dark Theme (Pitch Black & Cyan Neon) */
+[data-theme="dark"] {
+  --page-bg: #030712;
+  --panel-bg: #090d16;
+  --card-bg: #111827;
+  --card-hover: #1f2937;
+  --input-bg: #030712;
+  --ink: #f9fafb;
+  --muted: #9ca3af;
+  --border-color: #1f2937;
+  --border-glow: rgba(56, 189, 248, 0.4);
+  --button-dark: #38bdf8;
+  --button-text: #030712;
+  --accent-teal: #2dd4bf;
+  --accent-gold: #38bdf8;
+  --table-header-bg: #090d16;
+  --card-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
+}
+
+/* Unified Full Light Theme (Hanover Sand & Sleek Black Highlights) */
+[data-theme="light"] {
+  --page-bg: #f4eee6;
+  --panel-bg: #eae3d9;
+  --card-bg: #ded3c5;
+  --card-hover: #d2c5b4;
+  --input-bg: #ffffff;
+  --ink: #111827;
+  --muted: #4b5563;
+  --border-color: rgba(17, 24, 39, 0.18);
+  --border-glow: rgba(17, 24, 39, 0.4);
+  --button-dark: #111827;
+  --button-text: #ffffff;
+  --accent-teal: #0f766e;
+  --accent-gold: #111827;
+  --table-header-bg: #ded3c5;
+  --card-shadow: 0 14px 32px rgba(17, 24, 39, 0.08);
 }
 
 * {
@@ -26,26 +46,31 @@
 
 html, body, #root {
   min-height: 100%;
-  background-color: var(--page-bg);
+  width: 100%;
+  background-color: var(--page-bg) !important;
   color: var(--ink);
   font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Main Container Shell */
+/* Main Container Shell - Filled Unified Page */
 .page-shell {
   max-width: 1380px;
   margin: 0 auto;
   padding: 20px 28px 40px;
+  background-color: var(--page-bg);
+  min-height: 100vh;
 }
 
-/* Top Navigation Bar matching reference image */
+/* Top Navigation Bar */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 12px 8px 24px;
+  padding: 12px 0 24px;
+  background-color: var(--page-bg);
 }
 
 .brand {
@@ -84,13 +109,39 @@ html, body, #root {
 
 .nav-item:hover {
   color: var(--ink);
-  background: rgba(43, 35, 31, 0.05);
+  background: rgba(128, 128, 128, 0.1);
 }
 
 .nav-item.active {
   background: var(--button-dark);
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(45, 38, 36, 0.25);
+  color: var(--button-text);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  color: var(--ink);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  border-color: var(--ink);
+  transform: translateY(-1px);
 }
 
 .search-box {
@@ -99,13 +150,12 @@ html, body, #root {
   gap: 8px;
   padding: 8px 16px;
   border-radius: 999px;
-  background: #ffffff;
-  border: 1px solid var(--line-border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
 }
 
 .search-box input {
-  width: 130px;
+  width: 110px;
   border: none;
   outline: none;
   background: transparent;
@@ -119,16 +169,16 @@ html, body, #root {
   color: var(--muted);
 }
 
-/* Main Hero Banner Layout matching reference image */
+/* Main Hero Banner Layout */
 .hero-layout {
   display: grid;
   grid-template-columns: 1.05fr 1.15fr;
   align-items: stretch;
-  background: var(--panel-bg);
-  border: 1px solid var(--line-border);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 36px;
   overflow: hidden;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--card-shadow);
   margin-bottom: 28px;
 }
 
@@ -136,7 +186,7 @@ html, body, #root {
   position: relative;
   min-height: 380px;
   overflow: hidden;
-  background-color: #d8c8b8;
+  background-color: var(--border-color);
 }
 
 .hero-room-image {
@@ -149,22 +199,18 @@ html, body, #root {
   transition: transform 0.4s ease;
 }
 
-.hero-layout:hover .hero-room-image {
-  transform: scale(1.03);
-}
-
 .hero-copy {
-  padding: 44px 44px 44px 36px;
+  padding: 44px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .hero-copy h1 {
-  font-size: clamp(2.6rem, 4vw, 4.2rem);
+  font-size: clamp(2.5rem, 4vw, 4.2rem);
   line-height: 1.04;
   letter-spacing: -0.04em;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--ink);
   margin-bottom: 18px;
 }
@@ -188,8 +234,8 @@ html, body, #root {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  border: 1px solid rgba(43, 35, 31, 0.4);
-  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--border-color);
+  background: rgba(128, 128, 128, 0.08);
   color: var(--ink);
   padding: 8px 16px;
   font-size: 0.72rem;
@@ -207,23 +253,22 @@ html, body, #root {
   border-radius: 999px;
   border: none;
   background: var(--button-dark);
-  color: #ffffff;
+  color: var(--button-text);
   font-size: 0.78rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(45, 38, 36, 0.25);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
 }
 
 .cta-button:hover {
-  background: var(--button-hover);
   transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(45, 38, 36, 0.35);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
 }
 
-/* Numbered Module Grid Cards matching reference image (01, 02, 03, 04) */
+/* Numbered Module Grid Cards (01, 02, 03, 04) */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -253,8 +298,8 @@ html, body, #root {
   overflow: hidden;
   background-size: cover;
   background-position: center;
-  box-shadow: var(--shadow-soft);
-  border: 1px solid var(--line-border);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border-color);
   width: 100%;
   text-align: left;
   cursor: pointer;
@@ -263,14 +308,14 @@ html, body, #root {
 
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-hover);
+  border-color: var(--ink);
 }
 
 .product-card::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(20, 16, 14, 0.2), rgba(20, 16, 14, 0.75));
+  background: linear-gradient(180deg, rgba(10, 10, 10, 0.25), rgba(10, 10, 10, 0.8));
 }
 
 .card-number {
@@ -303,7 +348,7 @@ html, body, #root {
 .card-content h2 {
   font-size: 1.45rem;
   line-height: 1.15;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
@@ -314,11 +359,11 @@ html, body, #root {
   color: rgba(255, 255, 255, 0.88);
 }
 
-/* Filter Bar Component */
+/* Filter Bar */
 .filter-bar-container {
-  background-color: var(--panel-bg);
-  border: 1px solid var(--line-border);
-  border-radius: 18px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
   padding: 16px 24px;
   display: flex;
   flex-wrap: wrap;
@@ -326,7 +371,7 @@ html, body, #root {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 28px;
-  box-shadow: 0 4px 16px rgba(43, 35, 31, 0.05);
+  box-shadow: var(--card-shadow);
 }
 
 .filter-group {
@@ -340,13 +385,12 @@ html, body, #root {
   color: var(--muted);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .filter-group select {
-  background-color: #ffffff;
+  background-color: var(--input-bg);
   color: var(--ink);
-  border: 1px solid var(--line-border);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 8px 14px;
   font-size: 0.85rem;
@@ -363,7 +407,7 @@ html, body, #root {
 
 .reset-btn {
   background-color: transparent;
-  border: 1px solid var(--line-border);
+  border: 1px solid var(--border-color);
   color: var(--ink);
   padding: 8px 16px;
   border-radius: 999px;
@@ -373,10 +417,6 @@ html, body, #root {
   text-transform: uppercase;
 }
 
-.reset-btn:hover {
-  background: rgba(43, 35, 31, 0.08);
-}
-
 .export-btn {
   border: none;
   padding: 8px 18px;
@@ -384,19 +424,12 @@ html, body, #root {
   font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
-  color: #ffffff;
+  color: var(--button-text);
+  background-color: var(--button-dark);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.export-btn.csv {
-  background-color: var(--button-dark);
-}
-
-.export-btn.pdf {
-  background-color: var(--accent-teal);
-}
-
-/* KPI Cards Grid */
+/* KPI Grid */
 .top-kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -405,19 +438,18 @@ html, body, #root {
 }
 
 .kpi-card {
-  background-color: var(--panel-bg);
-  border: 1px solid var(--line-border);
-  border-radius: 20px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
   padding: 22px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 16px rgba(43, 35, 31, 0.04);
+  box-shadow: var(--card-shadow);
 }
 
 .kpi-card:hover {
   transform: translateY(-3px);
   border-color: var(--ink);
-  box-shadow: var(--shadow-soft);
 }
 
 .kpi-title {
@@ -425,7 +457,6 @@ html, body, #root {
   color: var(--muted);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
   margin-bottom: 8px;
 }
 
@@ -444,23 +475,23 @@ html, body, #root {
 }
 
 .kpi-trend.positive {
-  color: var(--accent-green);
+  color: #16a34a;
   font-weight: 700;
 }
 
 .kpi-trend.negative {
-  color: var(--accent-red);
+  color: #dc2626;
   font-weight: 700;
 }
 
 /* Governance KPI Summary Box */
 .governance-kpi-box {
-  background-color: var(--panel-bg);
-  border: 1px solid var(--line-border);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 24px;
   padding: 26px;
   margin-bottom: 28px;
-  box-shadow: 0 4px 16px rgba(43, 35, 31, 0.04);
+  box-shadow: var(--card-shadow);
 }
 
 .governance-kpi-box h3 {
@@ -493,7 +524,7 @@ html, body, #root {
   align-items: center;
   gap: 14px;
   padding-top: 16px;
-  border-top: 1px solid var(--line-border);
+  border-top: 1px solid var(--border-color);
   font-size: 0.85rem;
   color: var(--muted);
 }
@@ -511,7 +542,7 @@ html, body, #root {
   text-decoration: underline;
 }
 
-/* Dashboard Secondary Grid */
+/* Secondary Dashboard Grid */
 .dashboard-grid-2 {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
@@ -526,11 +557,11 @@ html, body, #root {
 }
 
 .chart-card, .data-table-card {
-  background-color: var(--panel-bg);
-  border: 1px solid var(--line-border);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 24px;
   padding: 24px;
-  box-shadow: 0 4px 16px rgba(43, 35, 31, 0.04);
+  box-shadow: var(--card-shadow);
 }
 
 .chart-card h4, .data-table-card h4 {
@@ -557,19 +588,18 @@ html, body, #root {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background-color: #ffffff;
+  background-color: var(--input-bg);
   border-radius: 12px;
-  border: 1px solid var(--line-border);
+  border: 1px solid var(--border-color);
 }
 
 .act-badge {
-  background-color: rgba(45, 38, 36, 0.08);
+  background-color: rgba(128, 128, 128, 0.15);
   color: var(--ink);
   font-size: 0.72rem;
   font-weight: 700;
   padding: 4px 10px;
   border-radius: 999px;
-  white-space: nowrap;
 }
 
 .act-desc {
@@ -593,7 +623,7 @@ html, body, #root {
 .analytics-table th {
   text-align: left;
   padding: 10px 14px;
-  background-color: rgba(43, 35, 31, 0.05);
+  background-color: var(--table-header-bg);
   color: var(--muted);
   font-weight: 700;
   font-size: 0.78rem;
@@ -602,7 +632,7 @@ html, body, #root {
 
 .analytics-table td {
   padding: 12px 14px;
-  border-bottom: 1px solid var(--line-border);
+  border-bottom: 1px solid var(--border-color);
   color: var(--ink);
 }
 
@@ -615,15 +645,15 @@ html, body, #root {
 
 .status-pill.good {
   background-color: rgba(22, 163, 74, 0.15);
-  color: var(--accent-green);
+  color: #16a34a;
 }
 
 .status-pill.overdue {
   background-color: rgba(220, 38, 38, 0.15);
-  color: var(--accent-red);
+  color: #dc2626;
 }
 
-/* Toast Notifications */
+/* Toast Container */
 .toast-container {
   position: fixed;
   top: 24px;
@@ -636,10 +666,10 @@ html, body, #root {
 
 .toast {
   background-color: var(--button-dark);
-  color: #ffffff;
+  color: var(--button-text);
   padding: 14px 20px;
   border-radius: 14px;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
   font-size: 0.88rem;
   font-weight: 600;
   animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -650,11 +680,11 @@ html, body, #root {
   to { transform: translateX(0); opacity: 1; }
 }
 
-/* Modal Overlay */
+/* Modal System */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(30, 24, 21, 0.65);
+  background-color: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(6px);
   z-index: 9000;
   display: flex;
@@ -664,8 +694,8 @@ html, body, #root {
 }
 
 .modal-content {
-  background-color: var(--panel-bg);
-  border: 1px solid var(--line-border);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: 28px;
   width: 100%;
   max-width: 540px;
@@ -717,8 +747,8 @@ html, body, #root {
 .modal-field input,
 .modal-field select,
 .modal-field textarea {
-  background-color: #ffffff;
-  border: 1px solid var(--line-border);
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
   color: var(--ink);
   padding: 12px 14px;
   border-radius: 10px;
@@ -734,7 +764,7 @@ html, body, #root {
 
 .btn-secondary {
   background-color: transparent;
-  border: 1px solid var(--line-border);
+  border: 1px solid var(--border-color);
   color: var(--ink);
   padding: 10px 20px;
   border-radius: 999px;
@@ -745,24 +775,57 @@ html, body, #root {
 .btn-primary {
   background-color: var(--button-dark);
   border: none;
-  color: #ffffff;
+  color: var(--button-text);
   padding: 10px 24px;
   border-radius: 999px;
   font-weight: 700;
   cursor: pointer;
 }
 
-/* Printable Report */
+/* Printable Report & Executive Analytics Container */
 .report-preview-container {
-  background-color: #ffffff;
-  color: #1e293b;
+  background-color: var(--card-bg);
+  color: var(--ink);
+  border: 1px solid var(--border-color);
   border-radius: 20px;
   padding: 40px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+}
+
+.report-preview-container h2,
+.report-preview-container h3,
+.report-preview-container strong {
+  color: var(--ink);
+}
+
+.report-preview-container .governance-kpi-box {
+  background-color: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.report-preview-container .kpi-bullet-list li {
+  color: var(--ink);
+  font-size: 0.92rem;
+  margin-bottom: 8px;
+}
+
+.report-preview-container .analytics-table th {
+  background-color: var(--panel-bg);
+  color: var(--muted);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.report-preview-container .analytics-table td {
+  color: var(--ink);
+  border-bottom: 1px solid var(--border-color);
 }
 
 @media print {
-  .topbar, .filter-bar-container, .export-btn, .kpi-action-bar, .toast-container, .search-box {
+  .topbar, .filter-bar-container, .export-btn, .kpi-action-bar, .toast-container, .search-box, .theme-toggle-btn {
     display: none !important;
   }
   .page-shell, .report-preview-container {
@@ -770,6 +833,9 @@ html, body, #root {
     margin: 0 !important;
     box-shadow: none !important;
     background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .report-preview-container * {
     color: #000000 !important;
   }
 }
