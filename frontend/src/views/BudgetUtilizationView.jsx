@@ -7,7 +7,7 @@ const formatRupees = (amount) => new Intl.NumberFormat('en-IN', {
   maximumFractionDigits: 0,
 }).format(amount || 0);
 
-export const BudgetUtilizationView = ({ data, reallocations = [], onShowToast, onOpenModal }) => {
+export const BudgetUtilizationView = ({ data, reallocations = [], onShowToast, onOpenModal, onOpenActionModal }) => {
   const [auditedDepartment, setAuditedDepartment] = useState(null);
 
   if (!data) return <div className="loading-state">Loading Budget Utilization...</div>;
@@ -105,7 +105,9 @@ export const BudgetUtilizationView = ({ data, reallocations = [], onShowToast, o
               <th>Reference</th>
               <th>Department</th>
               <th>Reallocated Amount (INR)</th>
+              <th>Assigned Officer</th>
               <th>Recorded At</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -114,11 +116,20 @@ export const BudgetUtilizationView = ({ data, reallocations = [], onShowToast, o
                 <td><strong>{reallocation.id}</strong></td>
                 <td>{reallocation.department}</td>
                 <td>{formatRupees(reallocation.amount)}</td>
+                <td>{reallocation.assignedOfficer || 'Finance Desk'}</td>
                 <td>{reallocation.createdAt}</td>
+                <td>
+                  <button
+                    className="grievance-row-action action-reassign"
+                    onClick={() => onOpenActionModal?.({ ...reallocation, status: 'IN_PROGRESS' }, 'reassign')}
+                  >
+                    Reassign
+                  </button>
+                </td>
               </tr>
             )) : (
               <tr>
-                <td colSpan="4" style={{ textAlign: 'center', color: 'var(--muted)' }}>No reallocations recorded yet.</td>
+                <td colSpan="6" style={{ textAlign: 'center', color: 'var(--muted)' }}>No reallocations recorded yet.</td>
               </tr>
             )}
           </tbody>

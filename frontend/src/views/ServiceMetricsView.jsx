@@ -106,6 +106,7 @@ export const ServiceMetricsView = ({ data, applications = [], onUpdateApplicatio
             <tr>
               <th>Service ID</th>
               <th>Applicant</th>
+              <th>Assigned Officer</th>
               <th>Service Type</th>
               <th>Ward</th>
               <th>Filed</th>
@@ -120,6 +121,7 @@ export const ServiceMetricsView = ({ data, applications = [], onUpdateApplicatio
               <tr key={record.id}>
                 <td><strong style={{ color: '#38bdf8' }}>#{record.id}</strong></td>
                 <td>{record.applicant}</td>
+                <td>{record.assignedOfficer || 'Unassigned'}</td>
                 <td>{record.type}</td>
                 <td>{record.ward}</td>
                 <td>{record.date}</td>
@@ -160,6 +162,12 @@ export const ServiceMetricsView = ({ data, applications = [], onUpdateApplicatio
                       style={{ background: 'rgba(45, 212, 191, 0.15)', color: '#2dd4bf', border: '1px solid #2dd4bf', padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: '700', cursor: 'pointer' }}
                     >
                       ✓ Approve
+                    </button>
+                    <button
+                      className="grievance-row-action action-reassign"
+                      onClick={() => onOpenActionModal?.(record, 'reassign')}
+                    >
+                      👤 Reassign
                     </button>
                   </div>
                 </td>

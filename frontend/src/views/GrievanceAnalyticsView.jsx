@@ -136,6 +136,7 @@ export const GrievanceAnalyticsView = ({
               <th>Category</th>
               <th>Ward</th>
               <th>Filed</th>
+              <th>Assigned Officer</th>
               <th>Status</th>
               <th style={{ textAlign: 'center' }}>Management Actions</th>
             </tr>
@@ -148,6 +149,7 @@ export const GrievanceAnalyticsView = ({
                 <td>{c.category}</td>
                 <td>{c.ward}</td>
                 <td><span style={{ fontSize: '0.78rem', color: 'var(--muted)' }}>{c.timestamp}</span></td>
+                <td>{c.assignedOfficer || 'Unassigned'}</td>
                 <td>
                   <span className={`status-pill ${c.status === 'RESOLVED' ? 'good' : c.status === 'OVERDUE' ? 'overdue' : 'good'}`}>
                     {c.status}

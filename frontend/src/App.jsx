@@ -13,6 +13,7 @@ import { GovernanceCommandView } from './views/GovernanceCommandView.jsx';
 import { ThreeBackground } from './components/ThreeBackground.jsx';
 import { ActionControlModal } from './components/ActionControlModal.jsx';
 import { getFilteredGovernanceData } from './wardDataStore.js';
+import { fetchOperationalRecords, saveOperationalRecord } from './operationalRecordsApi.js';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -54,11 +55,11 @@ function App() {
       return [];
     }
     return [
-      { id: 'APP-1847', applicant: 'Priya Sharma', type: 'Birth Certificate', ward: 'Ward 2', date: '2 hrs ago', status: 'APPROVED', department: 'Health & Education', progress: 100, workflowStage: 'Approved / completed' },
-      { id: 'APP-2258', applicant: 'Rohit Menon', type: 'Water Connection', ward: 'Ward 1', date: '5 hrs ago', status: 'IN_PROGRESS', department: 'Water Supply', progress: 55, workflowStage: 'Field verification' },
-      { id: 'APP-3120', applicant: 'Ananya Iyer', type: 'Trade License', ward: 'Ward 3', date: '1 day ago', status: 'PENDING', department: 'Commercial Licensing', progress: 15, workflowStage: 'Application received' },
-      { id: 'APP-4018', applicant: 'Harsh Gupta', type: 'Road Maintenance', ward: 'Ward 4', date: '2 days ago', status: 'OVERDUE', department: 'Public Works & Roads', progress: 35, workflowStage: 'SLA overdue' },
-      { id: 'APP-5421', applicant: 'Nisha Patel', type: 'Sanitation Request', ward: 'Ward 5', date: '3 days ago', status: 'APPROVED', department: 'Sanitation & Waste', progress: 100, workflowStage: 'Approved / completed' },
+      { id: 'APP-1847', applicant: 'Priya Sharma', type: 'Birth Certificate', ward: 'Ward 2', date: '2 hrs ago', status: 'APPROVED', department: 'Health & Education', progress: 100, workflowStage: 'Approved / completed', assignedOfficer: 'Officer Sunita Gupta' },
+      { id: 'APP-2258', applicant: 'Rohit Menon', type: 'Water Connection', ward: 'Ward 1', date: '5 hrs ago', status: 'IN_PROGRESS', department: 'Water Supply', progress: 55, workflowStage: 'Field verification', assignedOfficer: 'Officer Rajesh Kumar' },
+      { id: 'APP-3120', applicant: 'Ananya Iyer', type: 'Trade License', ward: 'Ward 3', date: '1 day ago', status: 'PENDING', department: 'Commercial Licensing', progress: 15, workflowStage: 'Application received', assignedOfficer: 'Officer Amit Patel' },
+      { id: 'APP-4018', applicant: 'Harsh Gupta', type: 'Road Maintenance', ward: 'Ward 4', date: '2 days ago', status: 'OVERDUE', department: 'Public Works & Roads', progress: 35, workflowStage: 'SLA overdue', assignedOfficer: 'Officer Priya Sharma' },
+      { id: 'APP-5421', applicant: 'Nisha Patel', type: 'Sanitation Request', ward: 'Ward 5', date: '3 days ago', status: 'APPROVED', department: 'Sanitation & Waste', progress: 100, workflowStage: 'Approved / completed', assignedOfficer: 'Officer Vikram Singh' },
     ];
   });
   const [budgetReallocations, setBudgetReallocations] = useState(() => {
@@ -77,14 +78,6 @@ function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', themeMode);
   }, [themeMode]);
-
-  useEffect(() => {
-    window.localStorage.setItem('civicpulse-service-applications', JSON.stringify(serviceApplications));
-  }, [serviceApplications]);
-
-  useEffect(() => {
-    window.localStorage.setItem('civicpulse-budget-reallocations', JSON.stringify(budgetReallocations));
-  }, [budgetReallocations]);
 
   // Modal and Toast State
   const [toast, setToast] = useState(null);
@@ -110,40 +103,107 @@ function App() {
     }, 3800);
   };
 
-  const handleComplaintAction = (targetItem, actionType, payload = {}) => {
-    setComplaintsList((prev) => prev.map((complaint) => {
-      if (complaint.id !== targetItem.id) return complaint;
-
-      if (actionType === 'approve') {
-        return { ...complaint, status: 'APPROVED', assignedOfficer: payload.assignedOfficer || complaint.assignedOfficer };
-      }
-
-      if (actionType === 'reassign') {
-        return {
-          ...complaint,
-          assignedOfficer: payload.assignedOfficer || complaint.assignedOfficer,
-          status: complaint.status === 'OVERDUE' ? 'IN_PROGRESS' : complaint.status,
-        };
-      }
-
-      if (actionType === 'escalate') {
-        return { ...complaint, status: 'OVERDUE' };
-      }
-
-      return complaint;
-    }));
+  const persistOperationalRecord = async (recordType, record) => {
+    try {
+      await saveOperationalRecord(recordType, record);
+      return true;
+    } catch (error) {
+      showToast(`Could not save this record to MongoDB: ${error.message}`, 'warning');
+      return false;
+    }
   };
 
-  const updateServiceApplication = (targetItem, status) => {
+  useEffect(() => {
+    let cancelled = false;
+
+    const hydrateOperationalRecords = async () => {
+      const [storedComplaints, storedApplications, storedReallocations] = await Promise.all([
+        fetchOperationalRecords('grievances'),
+        fetchOperationalRecords('service-applications'),
+        fetchOperationalRecords('budget-reallocations'),
+      ]);
+      if (cancelled) return;
+
+      const recordsToSeed = [
+        ['grievances', storedComplaints, complaintsList],
+        ['service-applications', storedApplications, serviceApplications],
+        ['budget-reallocations', storedReallocations, budgetReallocations],
+      ];
+
+      for (const [recordType, storedRecords, fallbackRecords] of recordsToSeed) {
+        if (storedRecords.length === 0 && fallbackRecords.length > 0) {
+          for (const record of fallbackRecords) {
+            const savedRecord = await saveOperationalRecord(recordType, record);
+            if (recordType === 'grievances') setComplaintsList((previous) => previous.map((item) => item.id === savedRecord.id ? savedRecord : item));
+            if (recordType === 'service-applications') setServiceApplications((previous) => previous.map((item) => item.id === savedRecord.id ? savedRecord : item));
+            if (recordType === 'budget-reallocations') setBudgetReallocations((previous) => previous.map((item) => item.id === savedRecord.id ? savedRecord : item));
+          }
+        }
+      }
+
+      if (storedComplaints.length > 0) setComplaintsList(storedComplaints);
+      if (storedApplications.length > 0) setServiceApplications(storedApplications);
+      if (storedReallocations.length > 0) setBudgetReallocations(storedReallocations);
+      window.localStorage.removeItem('civicpulse-service-applications');
+      window.localStorage.removeItem('civicpulse-budget-reallocations');
+    };
+
+    hydrateOperationalRecords().catch((error) => {
+      if (!cancelled) showToast(`Could not load operational records from MongoDB: ${error.message}`, 'warning');
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleComplaintAction = async (targetItem, actionType, payload = {}) => {
+    const currentComplaint = complaintsList.find((complaint) => complaint.id === targetItem.id);
+    if (!currentComplaint) return;
+
+    let updatedComplaint = currentComplaint;
+    if (actionType === 'approve') {
+      updatedComplaint = { ...currentComplaint, status: 'APPROVED', assignedOfficer: payload.assignedOfficer || currentComplaint.assignedOfficer };
+    } else if (actionType === 'reassign') {
+      updatedComplaint = {
+        ...currentComplaint,
+        assignedOfficer: payload.assignedOfficer || currentComplaint.assignedOfficer,
+        status: currentComplaint.status === 'OVERDUE' ? 'IN_PROGRESS' : currentComplaint.status,
+      };
+    } else if (actionType === 'escalate') {
+      updatedComplaint = { ...currentComplaint, status: 'OVERDUE' };
+    } else {
+      return;
+    }
+
+    if (await persistOperationalRecord('grievances', updatedComplaint)) {
+      setComplaintsList((previous) => previous.map((complaint) => complaint.id === updatedComplaint.id ? updatedComplaint : complaint));
+    }
+  };
+
+  const updateServiceApplication = async (targetItem, status, assignedOfficer) => {
     const workflow = {
       PENDING: { progress: 15, workflowStage: 'Application received' },
       IN_PROGRESS: { progress: 55, workflowStage: 'Verification and processing' },
       APPROVED: { progress: 100, workflowStage: 'Approved / completed' },
       OVERDUE: { progress: 35, workflowStage: 'SLA overdue' },
     };
-    setServiceApplications((prev) => prev.map((application) => (
-      application.id === targetItem.id ? { ...application, status, ...workflow[status] } : application
-    )));
+    const updatedApplication = {
+      ...targetItem,
+      status,
+      ...(workflow[status] || {}),
+      ...(assignedOfficer ? { assignedOfficer } : {}),
+    };
+    if (await persistOperationalRecord('service-applications', updatedApplication)) {
+      setServiceApplications((previous) => previous.map((application) => application.id === updatedApplication.id ? updatedApplication : application));
+    }
+  };
+
+  const updateBudgetReallocation = async (targetItem, assignedOfficer) => {
+    const updatedReallocation = { ...targetItem, assignedOfficer };
+    if (await persistOperationalRecord('budget-reallocations', updatedReallocation)) {
+      setBudgetReallocations((previous) => previous.map((reallocation) => reallocation.id === updatedReallocation.id ? updatedReallocation : reallocation));
+    }
   };
 
   useEffect(() => {
@@ -222,8 +282,9 @@ function App() {
     }, 400);
   };
 
-  const handleModalSubmit = (e) => {
+  const handleModalSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     if (activeModal === 'login') {
       if (loginEmail === 'civilpulse@gmail.com' && loginPassword === 'civicpulse@123') {
         setUserSession({
@@ -249,6 +310,7 @@ function App() {
         description: modalForm.description || 'New grievance registered via citizen portal.',
         assignedOfficer: modalForm.assignedOfficer || 'Officer Rajesh Kumar (Ward 1)',
       };
+      if (!(await persistOperationalRecord('grievances', newComplaint))) return;
       setComplaintsList((prev) => [newComplaint, ...prev]);
       showToast(`✓ New Grievance #${newId} recorded! Added to active complaint registry.`, 'success');
     } else if (activeModal === 'service') {
@@ -270,20 +332,42 @@ function App() {
         department: departmentByType[serviceType],
         progress: 15,
         workflowStage: 'Application received',
+        assignedOfficer: 'Service Intake Team',
       };
+      if (!(await persistOperationalRecord('service-applications', newApplication))) return;
       setServiceApplications((prev) => [newApplication, ...prev]);
       showToast(`✓ Service application #${newId} added to the M2 registry.`, 'success');
     } else if (activeModal === 'feedback') {
+      const feedbackRecord = {
+        id: `FDB-2026-${Math.floor(1000 + Math.random() * 9000)}`,
+        citizenName: formData.get('feedbackName') || 'Anonymous Citizen',
+        department: formData.get('feedbackDepartment'),
+        rating: Number(formData.get('feedbackRating')),
+        comment: formData.get('feedbackComment'),
+        createdAt: new Date().toISOString(),
+      };
+      if (!(await persistOperationalRecord('feedback', feedbackRecord))) return;
       showToast('✓ Citizen Feedback recorded! Thank you for rating.', 'success');
     } else if (activeModal === 'payment') {
-      showToast(`✓ Payment recorded! Receipt #REC-${Math.floor(100000 + Math.random() * 900000)} generated.`, 'success');
+      const paymentRecord = {
+        id: `REC-${Math.floor(100000 + Math.random() * 900000)}`,
+        source: formData.get('paymentSource'),
+        amount: Number(formData.get('paymentAmount')),
+        ward: formData.get('paymentWard'),
+        status: 'RECORDED',
+        createdAt: new Date().toISOString(),
+      };
+      if (!(await persistOperationalRecord('payments', paymentRecord))) return;
+      showToast(`✓ Payment recorded in MongoDB! Receipt #${paymentRecord.id} generated.`, 'success');
     } else if (activeModal === 'budget') {
       const newReallocation = {
         id: `BUD-2026-${Math.floor(1000 + Math.random() * 9000)}`,
         department: modalForm.budgetDepartment || 'Public Works & Roads',
         amount: Number(modalForm.budgetAmount),
         createdAt: new Date().toLocaleString('en-IN'),
+        assignedOfficer: 'Finance Desk',
       };
+      if (!(await persistOperationalRecord('budget-reallocations', newReallocation))) return;
       setBudgetReallocations((prev) => [newReallocation, ...prev]);
       showToast(`✓ ₹${newReallocation.amount.toLocaleString('en-IN')} reallocated to ${newReallocation.department} and added to the M3 register.`, 'success');
     } else if (activeModal === 'logout') {
@@ -573,6 +657,7 @@ function App() {
                   reallocations={budgetReallocations}
                   onShowToast={showToast}
                   onOpenModal={(modal) => setActiveModal(modal)}
+                  onOpenActionModal={(item, actionType) => setActionModalState({ item, actionType })}
                 />
                 <div style={{ marginTop: '24px' }}>
                   <RevenueTrackingView 
@@ -607,11 +692,13 @@ function App() {
           actionType={actionModalState.actionType}
           onClose={() => setActionModalState(null)}
           onShowToast={showToast}
-          onActionComplete={(updatedItem, actionType, payload) => {
+          onActionComplete={async (updatedItem, actionType, payload) => {
             if (serviceApplications.some((application) => application.id === updatedItem.id)) {
-              updateServiceApplication(updatedItem, actionType === 'approve' ? 'APPROVED' : updatedItem.status);
+              await updateServiceApplication(updatedItem, actionType === 'approve' ? 'APPROVED' : updatedItem.status, payload?.assignedOfficer);
+            } else if (budgetReallocations.some((reallocation) => reallocation.id === updatedItem.id)) {
+              await updateBudgetReallocation(updatedItem, payload?.assignedOfficer || updatedItem.assignedOfficer);
             } else {
-              handleComplaintAction(updatedItem, actionType, payload);
+              await handleComplaintAction(updatedItem, actionType, payload);
             }
             setActionModalState(null);
           }}
@@ -793,11 +880,11 @@ function App() {
                   <>
                     <div className="modal-field">
                       <label>Citizen Name:</label>
-                      <input type="text" placeholder="Your Name (Optional)" />
+                      <input name="feedbackName" type="text" placeholder="Your Name (Optional)" />
                     </div>
                     <div className="modal-field">
                       <label>Department:</label>
-                      <select required>
+                      <select name="feedbackDepartment" required>
                         <option value="Water Supply">Water Supply & Sewerage</option>
                         <option value="Public Works">Public Works & Roads</option>
                         <option value="Sanitation">Sanitation & Waste</option>
@@ -806,7 +893,7 @@ function App() {
                     </div>
                     <div className="modal-field">
                       <label>Rating (1 to 5 Stars):</label>
-                      <select required>
+                      <select name="feedbackRating" required>
                         <option value="5">⭐⭐⭐⭐⭐ (5/5) Excellent Service</option>
                         <option value="4">⭐⭐⭐⭐ (4/5) Good Experience</option>
                         <option value="3">⭐⭐⭐ (3/5) Average Resolution</option>
@@ -814,7 +901,7 @@ function App() {
                     </div>
                     <div className="modal-field">
                       <label>Feedback Comment:</label>
-                      <textarea rows={3} placeholder="Share your experience..." required />
+                      <textarea name="feedbackComment" rows={3} placeholder="Share your experience..." required />
                     </div>
                   </>
                 )}
@@ -823,19 +910,19 @@ function App() {
                   <>
                     <div className="modal-field">
                       <label>Payment Source:</label>
-                      <select required>
+                      <select name="paymentSource" required>
                         <option value="Property Tax">Property Tax Collection</option>
                         <option value="Trade License Fee">Trade License Renewal</option>
                         <option value="Water Tariff">Water Tariff Bill</option>
                       </select>
                     </div>
                     <div className="modal-field">
-                      <label>Amount ($):</label>
-                      <input type="number" placeholder="Enter amount..." required min="1" />
+                      <label>Amount (₹):</label>
+                      <input name="paymentAmount" type="number" placeholder="Enter amount in rupees..." required min="1" step="1" />
                     </div>
                     <div className="modal-field">
                       <label>Ward:</label>
-                      <select required>
+                      <select name="paymentWard" required>
                         <option value="Ward 1">Ward 1</option>
                         <option value="Ward 2">Ward 2</option>
                         <option value="Ward 3">Ward 3</option>
@@ -892,6 +979,16 @@ function App() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Interactive Action Control Modal (View, Approve, Escalate, Reassign, Audit) */}
+      {actionModalState && (
+        <ActionControlModal
+          item={actionModalState.item}
+          actionType={actionModalState.actionType}
+          onClose={() => setActionModalState(null)}
+          onShowToast={showToast}
+        />
       )}
     </div>
   );
