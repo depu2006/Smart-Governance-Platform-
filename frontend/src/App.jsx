@@ -223,14 +223,16 @@ function App() {
       category: filters.category,
     }).toString();
 
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+
     Promise.all([
-      fetch(`http://localhost:8081/api/analytics/executive?${queryParams}`).then((r) => r.json()).catch(() => null),
-      fetch(`http://localhost:8081/api/analytics/services?${queryParams}`).then((r) => r.json()).catch(() => null),
-      fetch(`http://localhost:8081/api/analytics/grievances?${queryParams}`).then((r) => r.json()).catch(() => null),
-      fetch(`http://localhost:8081/api/analytics/revenue?${queryParams}`).then((r) => r.json()).catch(() => null),
-      fetch(`http://localhost:8081/api/analytics/budget?${queryParams}`).then((r) => r.json()).catch(() => null),
-      fetch(`http://localhost:8081/api/analytics/department-performance?${queryParams}`).then((r) => r.json()).catch(() => null),
-      fetch(`http://localhost:8081/api/analytics/citizen-satisfaction?${queryParams}`).then((r) => r.json()).catch(() => null),
+      fetch(`${apiBase}/api/analytics/executive?${queryParams}`).then((r) => r.json()).catch(() => null),
+      fetch(`${apiBase}/api/analytics/services?${queryParams}`).then((r) => r.json()).catch(() => null),
+      fetch(`${apiBase}/api/analytics/grievances?${queryParams}`).then((r) => r.json()).catch(() => null),
+      fetch(`${apiBase}/api/analytics/revenue?${queryParams}`).then((r) => r.json()).catch(() => null),
+      fetch(`${apiBase}/api/analytics/budget?${queryParams}`).then((r) => r.json()).catch(() => null),
+      fetch(`${apiBase}/api/analytics/department-performance?${queryParams}`).then((r) => r.json()).catch(() => null),
+      fetch(`${apiBase}/api/analytics/citizen-satisfaction?${queryParams}`).then((r) => r.json()).catch(() => null),
     ])
       .then(([execRes, serviceRes, grvRes, revRes, budRes, deptRes, satRes]) => {
         if (execRes && Object.keys(execRes).length > 0) setExecData((prev) => ({ ...prev, ...execRes }));
