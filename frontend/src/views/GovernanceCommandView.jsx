@@ -8,7 +8,7 @@ export const GovernanceCommandView = ({ onNavigateTab, onShowToast }) => {
   };
 
   const handleMongoSync = () => {
-    fetch('http://localhost:8081/api/analytics/mongodb-status')
+    fetch('https://civicpulse-backend-143e.onrender.com/api/analytics/mongodb-status')
       .then(res => res.json())
       .then(res => {
         if (onShowToast) {

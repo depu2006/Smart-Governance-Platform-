@@ -1,4 +1,4 @@
-const OPERATIONAL_RECORDS_URL = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081'}/api/operational-records`;
+const OPERATIONAL_RECORDS_URL = `${import.meta.env.VITE_API_BASE_URL || 'https://civicpulse-backend-143e.onrender.com'}/api/operational-records`;
 
 export async function fetchOperationalRecords(recordType) {
   const response = await fetch(`${OPERATIONAL_RECORDS_URL}/${encodeURIComponent(recordType)}`);

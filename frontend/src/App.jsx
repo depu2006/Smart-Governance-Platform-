@@ -223,7 +223,7 @@ function App() {
       category: filters.category,
     }).toString();
 
-    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081';
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://civicpulse-backend-143e.onrender.com';
 
     Promise.all([
       fetch(`${apiBase}/api/analytics/executive?${queryParams}`).then((r) => r.json()).catch(() => null),
